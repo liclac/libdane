@@ -1,0 +1,14 @@
+# User data
+*.sublime-workspace
+
+# CMake
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+Makefile
+
+# Built products
+/bin
+/lib
+/vendor/*-prefix
+
