@@ -6,7 +6,7 @@
 namespace libdane
 {
 	/**
-	 * Represents a single DANE DNS record.
+	 * @brief Represents a single DANE DNS record.
 	 */
 	class DANERecord
 	{
