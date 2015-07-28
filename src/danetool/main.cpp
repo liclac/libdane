@@ -1,10 +1,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <deque>
 #include <thread>
 #include <functional>
 #include <asio.hpp>
 #include <libdane/DANE.h>
+#include <libdane/DANERecord.h>
 
 using namespace libdane;
 
@@ -30,7 +32,11 @@ int main(int argc, char **argv)
 	DANE dane(service);
 	
 	// Look up the DANE record for the mail server on the domain
-	dane.lookupDANE(std::string("_25._tcp.") + args[0]);
+	dane.lookupDANE(std::string("_25._tcp.") + args[0], [&](std::deque<DANERecord> records) {
+		for (auto it = records.begin(); it != records.end(); ++it) {
+			std::cout << it->toString() << std::endl;
+		}
+	});
 	
 	// Run ASIO's event loop until it runs out of work
 	// (You can run this across multiple worker threads if you prefer)

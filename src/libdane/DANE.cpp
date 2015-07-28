@@ -1,4 +1,5 @@
 #include <libdane/DANE.h>
+#include <libdane/DANERecord.h>
 #include <iostream>
 #include <sstream>
 #include <memory>
@@ -30,7 +31,7 @@ DANE::~DANE()
 	delete p;
 }
 
-void DANE::lookupDANE(const std::string &domain)
+void DANE::lookupDANE(const std::string &domain, std::function<void(std::deque<DANERecord>)> callback)
 {
 	service.post([&] {
 		std::shared_ptr<ldns_rdf> ldomain(ldns_dname_new_frm_str(domain.c_str()), ldns_rdf_deep_free);
@@ -46,18 +47,20 @@ void DANE::lookupDANE(const std::string &domain)
 			throw std::runtime_error(std::string("Coudn't formulate a query"));
 		}
 		
+		std::deque<DANERecord> records;
+		
 		std::shared_ptr<ldns_rr_list> list(ldns_pkt_rr_list_by_type(&*pkt, LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER), ldns_rr_list_deep_free);
 		for (size_t i = 0; i < ldns_rr_list_rr_count(&*list); i++) {
 			ldns_rr *rr = ldns_rr_list_rr(&*list, i);
 			
 			ldns_rdf *usage_rd = ldns_rr_rdf(rr, 0);
 			ldns_rdf *selector_rd = ldns_rr_rdf(rr, 1);
-			ldns_rdf *match_rd = ldns_rr_rdf(rr, 2);
+			ldns_rdf *mtype_rd = ldns_rr_rdf(rr, 2);
 			ldns_rdf *data_rd = ldns_rr_rdf(rr, 3);
 			
-			int8_t usage = ldns_rdf_data(usage_rd)[0];
-			int8_t selector = ldns_rdf_data(selector_rd)[0];
-			int8_t match = ldns_rdf_data(match_rd)[0];
+			DANERecord::Usage usage = static_cast<DANERecord::Usage>(ldns_rdf_data(usage_rd)[0]);
+			DANERecord::Selector selector = static_cast<DANERecord::Selector>(ldns_rdf_data(selector_rd)[0]);
+			DANERecord::MatchingType mtype = static_cast<DANERecord::MatchingType>(ldns_rdf_data(mtype_rd)[0]);
 			
 			std::stringstream data_s;
 			data_s << std::hex;
@@ -66,7 +69,9 @@ void DANE::lookupDANE(const std::string &domain)
 			}
 			std::string data = data_s.str();
 			
-			std::cout << (int)usage << " " << (int)selector << " " << (int)match << " " << data << std::endl;
+			records.emplace_back(usage, selector, mtype, data);
 		}
+		
+		callback(records);
 	});
 }
