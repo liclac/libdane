@@ -5,6 +5,9 @@
 
 namespace libdane
 {
+	/**
+	 * Represents a single DANE DNS record.
+	 */
 	class DANERecord
 	{
 	public:

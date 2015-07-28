@@ -11,6 +11,7 @@ extern "C" {
 
 using namespace libdane;
 
+/// @private
 struct DANE::Impl
 {
 	ldns_resolver *resolver = NULL;

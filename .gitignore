@@ -11,4 +11,5 @@ Makefile
 /bin
 /lib
 /vendor/*-prefix
+/docs
 
