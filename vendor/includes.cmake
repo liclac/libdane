@@ -7,4 +7,5 @@ if(APPLE)
 endif()
 
 include_directories(${VENDOR_DIR}/asio/asio/include)
+include_directories(${VENDOR_DIR}/catch/include)
 include_directories(${VENDOR_DIR}/libldns-prefix/include)

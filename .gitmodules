@@ -1,3 +1,6 @@
 [submodule "vendor/asio"]
 	path = vendor/asio
 	url = https://github.com/chriskohlhoff/asio.git
+[submodule "vendor/catch"]
+	path = vendor/catch
+	url = https://github.com/philsquared/Catch.git

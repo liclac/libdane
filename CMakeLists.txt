@@ -12,3 +12,16 @@ include_directories(include)
 
 add_subdirectory(vendor)
 add_subdirectory(src)
+
+enable_testing()
+add_subdirectory(test)
+
+# Custom `make check` target, that dumps output on test failute
+if (CMAKE_CONFIGURATION_TYPES)
+    add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} 
+        --force-new-ctest-process --output-on-failure 
+        --build-config "$<CONFIGURATION>")
+else()
+    add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} 
+        --force-new-ctest-process --output-on-failure)
+endif()
