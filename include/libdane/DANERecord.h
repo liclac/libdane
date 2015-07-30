@@ -7,7 +7,7 @@
 namespace libdane
 {
 	/**
-	 * @brief Represents a single DANE DNS record.
+	 * Represents a single DANE DNS record.
 	 */
 	class DANERecord
 	{
@@ -20,14 +20,14 @@ namespace libdane
 		enum Usage {
 			/**
 			 * Only the given CA certificate or public key may be used to issue
-			 * certificates for this server. The CA is not implicitly trusted
+			 * certificates for this server, the CA is not implicitly trusted
 			 * if it's not in the system's trust store.
 			 */
 			CAConstraints = 0,
 			
 			/**
-			 * Only the specified certificate or public key may be used. It
-			 * must be valid, and accepted by the system's trust store.
+			 * Only the specified certificate or public key may be used, it
+			 * must be valid and accepted by the system's trust store.
 			 */
 			ServiceCertificateConstraint = 1,
 			

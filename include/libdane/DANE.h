@@ -9,7 +9,7 @@ namespace libdane
 	class DANERecord;
 	
 	/**
-	 * @brief Manager class for looking up DANE records.
+	 * Manager class for looking up DANE records.
 	 * 
 	 * Under the hood, this class uses libldns and ASIO (C++11 standalone or
 	 * Boost) for DNS queries, and produces DANERecord objects.
