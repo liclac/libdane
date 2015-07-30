@@ -75,7 +75,7 @@ namespace libdane
 		/**
 		 * Constructs a DANE record with the given values.
 		 */
-		DANERecord(Usage usage, Selector selector, MatchingType mtype, std::vector<char> data);
+		DANERecord(Usage usage, Selector selector, MatchingType mtype, std::vector<unsigned char> data);
 		
 		/**
 		 * Destructor.
@@ -96,10 +96,10 @@ namespace libdane
 		
 		
 		
-		Usage usage;				///< Certificate Usage
-		Selector selector;			///< Selector
-		MatchingType mtype;			///< Matching Type
-		std::vector<char> data;		///< Data, as a hexadecimal string
+		Usage usage;						///< Certificate Usage
+		Selector selector;					///< Selector
+		MatchingType mtype;					///< Matching Type
+		std::vector<unsigned char> data;	///< Binary data
 	};
 }
 

@@ -64,7 +64,7 @@ void DANE::lookupDANE(const std::string &domain, std::function<void(std::deque<D
 			DANERecord::Selector selector = static_cast<DANERecord::Selector>(ldns_rdf_data(selector_rd)[0]);
 			DANERecord::MatchingType mtype = static_cast<DANERecord::MatchingType>(ldns_rdf_data(mtype_rd)[0]);
 			uint8_t* data_ptr = ldns_rdf_data(data_rd);
-			std::vector<char> data(data_ptr, data_ptr + ldns_rdf_size(data_rd));
+			std::vector<unsigned char> data(data_ptr, data_ptr + ldns_rdf_size(data_rd));
 			
 			records.emplace_back(usage, selector, mtype, data);
 		}

@@ -8,7 +8,7 @@ DANERecord::DANERecord()
 	
 }
 
-DANERecord::DANERecord(Usage usage, Selector selector, MatchingType mtype, std::vector<char> data):
+DANERecord::DANERecord(Usage usage, Selector selector, MatchingType mtype, std::vector<unsigned char> data):
 	usage(usage), selector(selector), mtype(mtype), data(data)
 {
 	
@@ -26,7 +26,7 @@ std::string DANERecord::dataString() const
 	for (auto it = data.begin(); it != data.end(); ++it) {
 		// Cast to uint8_t to make it the right sign, then to int to make it
 		// display as hex - a uint8_t on its own is printed as a char
-		ss << static_cast<int>(static_cast<uint8_t>(*it));
+		ss << static_cast<int>(*it);
 	}
 	return ss.str();
 }
