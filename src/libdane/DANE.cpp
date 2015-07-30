@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
+#include <vector>
 
 extern "C" {
 	#define HAVE_STDBOOL_H 1
@@ -62,13 +63,8 @@ void DANE::lookupDANE(const std::string &domain, std::function<void(std::deque<D
 			DANERecord::Usage usage = static_cast<DANERecord::Usage>(ldns_rdf_data(usage_rd)[0]);
 			DANERecord::Selector selector = static_cast<DANERecord::Selector>(ldns_rdf_data(selector_rd)[0]);
 			DANERecord::MatchingType mtype = static_cast<DANERecord::MatchingType>(ldns_rdf_data(mtype_rd)[0]);
-			
-			std::stringstream data_s;
-			data_s << std::hex;
-			for (size_t i = 0; i < ldns_rdf_size(data_rd); i++) {
-				data_s << (int)ldns_rdf_data(data_rd)[i];
-			}
-			std::string data = data_s.str();
+			uint8_t* data_ptr = ldns_rdf_data(data_rd);
+			std::vector<char> data(data_ptr, data_ptr + ldns_rdf_size(data_rd));
 			
 			records.emplace_back(usage, selector, mtype, data);
 		}

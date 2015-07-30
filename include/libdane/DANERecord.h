@@ -2,6 +2,7 @@
 #define DANERECORD_H
 
 #include <string>
+#include <vector>
 
 namespace libdane
 {
@@ -74,12 +75,17 @@ namespace libdane
 		/**
 		 * Constructs a DANE record with the given values.
 		 */
-		DANERecord(Usage usage, Selector selector, MatchingType mtype, const std::string &data);
+		DANERecord(Usage usage, Selector selector, MatchingType mtype, std::vector<char> data);
 		
 		/**
 		 * Destructor.
 		 */
 		virtual ~DANERecord();
+		
+		/**
+		 * Returns the record's data as a hexadecimal string.
+		 */
+		std::string dataString() const;
 		
 		/**
 		 * Returns a human-readable representation of the record.
@@ -90,10 +96,10 @@ namespace libdane
 		
 		
 		
-		Usage usage;			///< Certificate Usage
-		Selector selector;		///< Selector
-		MatchingType mtype;		///< Matching Type
-		std::string data;		///< Data, as a hexadecimal string
+		Usage usage;				///< Certificate Usage
+		Selector selector;			///< Selector
+		MatchingType mtype;			///< Matching Type
+		std::vector<char> data;		///< Data, as a hexadecimal string
 	};
 }
 
