@@ -1,5 +1,6 @@
 #include <libdane/DANERecord.h>
 #include <sstream>
+#include <iomanip>
 
 using namespace libdane;
 
@@ -22,9 +23,9 @@ DANERecord::~DANERecord()
 std::string DANERecord::dataString() const
 {
 	std::stringstream ss;
-	ss << std::hex;
+	ss << std::hex << std::setfill('0');
 	for (auto it = data.begin(); it != data.end(); ++it) {
-		ss << static_cast<int>(*it);
+		ss << std::setw(2) << static_cast<int>(*it);
 	}
 	return ss.str();
 }
