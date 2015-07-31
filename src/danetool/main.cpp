@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 	DANE dane(service);
 	
 	// Look up the DANE record for the mail server on the domain
-	dane.lookupDANE(std::string("_25._tcp.") + domain, [&](std::deque<DANERecord> records) {
+	dane.lookupDANE(domain, 25, DANE::TCP, [&](std::deque<DANERecord> records) {
 		for (auto it = records.begin(); it != records.end(); ++it) {
 			std::cout << it->toString() << std::endl;
 		}

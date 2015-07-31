@@ -21,6 +21,16 @@ namespace libdane
 	{
 	public:
 		/**
+		 * Enum for protocols in lookups.
+		 */
+		enum Protocol {
+			TCP,			///< Transmission Control Protocol
+			UDP,			///< User Datagram Protocol
+		};
+		
+		
+		
+		/**
 		 * Constructs a DANE Manager running on the given ASIO Service.
 		 */
 		DANE(asio::io_service &service);
@@ -38,7 +48,7 @@ namespace libdane
 		 * @param domain   Domain name to look up
 		 * @param callback Callback, receiving a DANERecord list
 		 */
-		void lookupDANE(const std::string &domain, std::function<void(std::deque<DANERecord>)> callback);
+		void lookupDANE(const std::string &domain, unsigned short port, Protocol proto, std::function<void(std::deque<DANERecord>)> callback);
 		
 	protected:
 		/**

@@ -33,12 +33,28 @@ DANE::~DANE()
 	delete p;
 }
 
-void DANE::lookupDANE(const std::string &domain, std::function<void(std::deque<DANERecord>)> callback)
+void DANE::lookupDANE(const std::string &domain, unsigned short port, Protocol proto, std::function<void(std::deque<DANERecord>)> callback)
 {
-	service.post([&] {
-		std::shared_ptr<ldns_rdf> ldomain(ldns_dname_new_frm_str(domain.c_str()), ldns_rdf_deep_free);
+	// Build a _<port>._<proto>.<domain> string for service lookup
+	std::stringstream record_path_ss;
+	record_path_ss << "_" << port << "._";
+	switch (proto) {
+		case TCP:
+			record_path_ss << "tcp";
+			break;
+		case UDP:
+			record_path_ss << "udp";
+			break;
+	}
+	record_path_ss << "." << domain;
+	std::string record_path = record_path_ss.str();
+	
+	// For now, just post a synchronous DNS lookup to a worker thread
+	// TODO: Use ASIO's network facilities for proper asynchrony
+	service.post([=] {
+		std::shared_ptr<ldns_rdf> ldomain(ldns_dname_new_frm_str(record_path.c_str()), ldns_rdf_deep_free);
 		if (!ldomain) {
-			throw std::runtime_error(std::string("Invalid domain: ") + domain);
+			throw std::runtime_error(std::string("Invalid record path: ") + record_path);
 		}
 		
 		std::shared_ptr<ldns_pkt> pkt(ldns_resolver_query(
@@ -50,10 +66,9 @@ void DANE::lookupDANE(const std::string &domain, std::function<void(std::deque<D
 		}
 		
 		std::deque<DANERecord> records;
-		
-		std::shared_ptr<ldns_rr_list> list(ldns_pkt_rr_list_by_type(&*pkt, LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER), ldns_rr_list_deep_free);
-		for (size_t i = 0; i < ldns_rr_list_rr_count(&*list); i++) {
-			ldns_rr *rr = ldns_rr_list_rr(&*list, i);
+		std::shared_ptr<ldns_rr_list> tlsalist(ldns_pkt_rr_list_by_type(&*pkt, LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER), ldns_rr_list_deep_free);
+		for (size_t i = 0; i < ldns_rr_list_rr_count(&*tlsalist); i++) {
+			ldns_rr *rr = ldns_rr_list_rr(&*tlsalist, i);
 			
 			ldns_rdf *usage_rd = ldns_rr_rdf(rr, 0);
 			ldns_rdf *selector_rd = ldns_rr_rdf(rr, 1);
