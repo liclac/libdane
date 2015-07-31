@@ -24,8 +24,6 @@ std::string DANERecord::dataString() const
 	std::stringstream ss;
 	ss << std::hex;
 	for (auto it = data.begin(); it != data.end(); ++it) {
-		// Cast to uint8_t to make it the right sign, then to int to make it
-		// display as hex - a uint8_t on its own is printed as a char
 		ss << static_cast<int>(*it);
 	}
 	return ss.str();
