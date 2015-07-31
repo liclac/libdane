@@ -34,9 +34,17 @@ int main(int argc, char **argv)
 		if (s[0] == '-') {
 			if (s == "--verify") {
 				verify = true;
+			} else {
+				std::cerr << "Unrecognized argument: " << s << std::endl;
+				printUsage(progname);
+				return 1;
 			}
-		} else {
+		} else if (domain.empty()) {
 			domain = s;
+		} else {
+			std::cerr << "Unrecognized argument: " << s << std::endl;
+			printUsage(progname);
+			return 1;
 		}
 	}
 	
