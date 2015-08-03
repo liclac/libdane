@@ -2,9 +2,10 @@
 #include <iostream>
 
 using namespace libdane;
+using namespace asio;
 
 App::App():
-	dane(service)
+	resolver(service), dane(service)
 {
 	
 }
@@ -22,14 +23,49 @@ int App::run(const std::vector<std::string> &args_)
 	}
 	
 	// Look up the DANE record for the mail server on the domain
-	dane.lookupDANE(args.domain, 25, DANE::TCP, [&](std::deque<DANERecord> records) {
+	dane.lookupDANE(args.domain, 465, DANE::TCP, [&](std::deque<DANERecord> records) {
 		for (auto it = records.begin(); it != records.end(); ++it) {
 			std::cout << it->toString() << std::endl;
+		}
+		
+		if (args.verify) {
+			this->verify(records);
 		}
 	});
 	
 	service.run();
 	return 0;
+}
+
+void App::verify(std::deque<libdane::DANERecord> records)
+{
+	ip::tcp::resolver::query q(args.domain, "465");
+	resolver.async_resolve(q, [this](const error_code& err, ip::tcp::resolver::iterator it) {
+		if (err) {
+			std::cerr << "Couldn't resolve domain: " << err.message() << std::endl;
+			return;
+		}
+		// std::cout << "Resolved!" << std::endl;
+		
+		ssl::context ctx(ssl::context::sslv23);
+		auto sock = std::make_shared<ssl::stream<ip::tcp::socket>>(service, ctx);
+		async_connect(sock->lowest_layer(), it, [sock](const asio::error_code& err, ip::tcp::resolver::iterator it) {
+			if (err) {
+				std::cerr << "Couldn't connect: " << err.message() << std::endl;
+				return;
+			}
+			// std::cout << "Connected!" << std::endl;
+			
+			sock->async_handshake(ssl::stream<ip::tcp::socket>::client, [sock](const error_code &err) {
+				if (err) {
+					std::cerr << "SSL Handshake failed: " << err.message() << std::endl;
+					return;
+				} else {
+					std::cout << "Success!" << std::endl;
+				}
+			});
+		});
+	});
 }
 
 bool App::parseArgs(const std::vector<std::string> &args_)

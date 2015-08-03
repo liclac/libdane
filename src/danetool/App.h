@@ -2,6 +2,7 @@
 #define DANETOOL_APP_H
 
 #include <asio.hpp>
+#include <asio/ssl.hpp>
 #include <libdane/DANE.h>
 #include <libdane/DANERecord.h>
 
@@ -30,6 +31,15 @@ public:
 	
 protected:
 	/**
+	 * Verifies an endpoint's presented certificate against a list of DANE records.
+	 * 
+	 * @param endpoint The endpoint to connect to
+	 * @param records  Records to verify against
+	 * @param cb       Callback for verification results
+	 */
+	void verify(std::deque<libdane::DANERecord> records);
+	
+	/**
 	 * Parses commandline arguments.
 	 * 
 	 * @see         App::progname
@@ -47,8 +57,9 @@ protected:
 	
 	
 	
-	asio::io_service service;	///< ASIO Service
-	libdane::DANE dane;			///< DANE manager object
+	asio::io_service service;			///< ASIO Service
+	asio::ip::tcp::resolver resolver;	///< DNS Resolver
+	libdane::DANE dane;					///< DANE manager object
 	
 	std::string progname;		///< Program name, as called
 	struct {
