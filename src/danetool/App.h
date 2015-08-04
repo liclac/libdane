@@ -1,10 +1,11 @@
 #ifndef DANETOOL_APP_H
 #define DANETOOL_APP_H
 
-#include <asio.hpp>
-#include <asio/ssl.hpp>
 #include <libdane/DANE.h>
 #include <libdane/DANERecord.h>
+#include <asio.hpp>
+#include <asio/ssl.hpp>
+#include <memory>
 
 class App
 {
@@ -31,13 +32,19 @@ public:
 	
 protected:
 	/**
+	 * Attempts to authorize with an SMTP host using STARTTLS.
+	 * 
+	 * @param records A list of DANE records for the domain.
+	 */
+	void connectSMTP(const std::string &domain, unsigned short port, std::deque<libdane::DANERecord> records);
+	
+	/**
 	 * Verifies an endpoint's presented certificate against a list of DANE records.
 	 * 
-	 * @param endpoint The endpoint to connect to
+	 * @param sock     Socket to initiate a TLS handshake on
 	 * @param records  Records to verify against
-	 * @param cb       Callback for verification results
 	 */
-	void verify(std::deque<libdane::DANERecord> records);
+	void handshake(std::shared_ptr<asio::ip::tcp::socket> sock, std::deque<libdane::DANERecord> records);
 	
 	/**
 	 * Parses commandline arguments.
