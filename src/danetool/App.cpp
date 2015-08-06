@@ -118,8 +118,8 @@ void App::connectSMTP(const std::string &domain, unsigned short port, std::deque
 
 void App::handshake(std::shared_ptr<asio::ip::tcp::socket> plain_sock, std::deque<libdane::DANERecord> records)
 {
-	ssl::context ctx(ssl::context::sslv23);
-	auto sock = std::make_shared<ssl::stream<ip::tcp::socket&>>(*plain_sock, ctx);
+	auto ctx = std::make_shared<ssl::context>(DANE::sslContextFrom(records));
+	auto sock = std::make_shared<ssl::stream<ip::tcp::socket&>>(*plain_sock, *ctx);
 	sock->async_handshake(ssl::stream<ip::tcp::socket>::client, [=](const error_code &err) {
 		if (err) {
 			std::cerr << "SSL Handshake failed: " << err.message() << std::endl;
@@ -129,6 +129,7 @@ void App::handshake(std::shared_ptr<asio::ip::tcp::socket> plain_sock, std::dequ
 		std::cout << "Success!" << std::endl;
 		
 		// Retain these, to prevent them from getting deleted
+		auto _ctx = ctx;
 		auto _sock = sock;
 		auto _plain_sock = plain_sock;
 	});

@@ -2,6 +2,7 @@
 #define DANE_H
 
 #include <asio.hpp>
+#include <asio/ssl.hpp>
 #include <deque>
 
 namespace libdane
@@ -39,6 +40,16 @@ namespace libdane
 		 * Destructor.
 		 */
 		virtual ~DANE();
+		
+		
+		
+		/**
+		 * Creates an SSL context from a list of records.
+		 * 
+		 * @param  records Records to verify against
+		 * @return         A preconfigured SSL context
+		 */
+		static asio::ssl::context sslContextFrom(std::deque<DANERecord> records);
 		
 		
 		

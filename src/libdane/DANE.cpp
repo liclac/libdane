@@ -33,6 +33,35 @@ DANE::~DANE()
 	delete p;
 }
 
+asio::ssl::context DANE::sslContextFrom(std::deque<DANERecord> records)
+{
+	asio::ssl::context ssl_ctx(asio::ssl::context::sslv23);
+	ssl_ctx.set_verify_mode(asio::ssl::verify_peer);
+	ssl_ctx.set_verify_callback([=](bool preverified, asio::ssl::verify_context &vc) {
+		X509_STORE_CTX *ctx = vc.native_handle();
+		X509* cert = X509_STORE_CTX_get_current_cert(ctx);
+		if (!cert) {
+			std::cout << "No certificate!" << std::endl;
+			return false;
+		}
+		
+		X509_NAME *iname = X509_get_issuer_name(cert);
+		X509_NAME *sname = X509_get_subject_name(cert);
+		
+		char *iname_s = X509_NAME_oneline(iname, NULL, 1024);
+		std::cout << "Issuer Name: " << iname_s << std::endl;
+		free(iname_s);
+		
+		char *sname_s = X509_NAME_oneline(sname, NULL, 1024);
+		std::cout << "Subject Name: " << sname_s << std::endl;
+		free(sname_s);
+		
+		return true;
+	});
+	
+	return ssl_ctx;
+}
+
 void DANE::lookupDANE(const std::string &domain, unsigned short port, Protocol proto, std::function<void(std::deque<DANERecord>)> callback)
 {
 	// Build a _<port>._<proto>.<domain> string for service lookup
