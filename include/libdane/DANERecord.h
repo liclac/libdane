@@ -1,5 +1,5 @@
-#ifndef DANERECORD_H
-#define DANERECORD_H
+#ifndef LIBDANE_DANERECORD_H
+#define LIBDANE_DANERECORD_H
 
 #include <string>
 #include <vector>

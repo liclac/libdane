@@ -1,5 +1,5 @@
-#ifndef DANE_H
-#define DANE_H
+#ifndef LIBDANE_DANE_H
+#define LIBDANE_DANE_H
 
 #include <asio.hpp>
 #include <asio/ssl.hpp>
