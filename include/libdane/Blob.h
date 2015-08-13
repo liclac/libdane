@@ -33,6 +33,11 @@ namespace libdane
 		 */
 		virtual ~Blob();
 		
+		/**
+		 * Compare two blobs' data.
+		 */
+		bool operator==(const Blob &other) const;
+		
 		
 		
 		/**

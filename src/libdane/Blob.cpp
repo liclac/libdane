@@ -27,6 +27,11 @@ Blob::~Blob()
 	
 }
 
+bool Blob::operator==(const Blob &other) const
+{
+	return this->data() == other.data();
+}
+
 
 
 const std::vector<unsigned char>& Blob::data() const { return m_data; }
