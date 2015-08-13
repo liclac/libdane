@@ -57,6 +57,8 @@ namespace libdane
 		 * Look up the DANE record for the given domain.
 		 * 
 		 * @param domain   Domain name to look up
+		 * @param port     Port to look up a service for
+		 * @param proto    Protocol to look up a service for
 		 * @param callback Callback, receiving a DANERecord list
 		 */
 		void lookupDANE(const std::string &domain, unsigned short port, Protocol proto, std::function<void(std::deque<DANERecord>)> callback);
