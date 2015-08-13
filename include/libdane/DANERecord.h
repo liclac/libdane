@@ -120,53 +120,6 @@ namespace libdane
 		
 		/// Implementation for verify() with DANERecord::DomainIssuedCertificate
 		bool verifyDomainIssuedCertificate(bool preverified, CertificateStore store) const;
-		
-	public:
-		/**
-		 * Structure for X509_STORE_CTX extra data.
-		 */
-		struct store_ctx_data_t {
-			bool pass_all_checks = false;	///< Pass all following checks
-		};
-		
-		/// Attachment index for a store_ctx_data_t
-		static int store_ctx_data_idx;
-		
-		/**
-		 * Returns the attached data for the given context.
-		 */
-		store_ctx_data_t *dataForContext(asio::ssl::verify_context &vc) const;
-		
-		/**
-		 * Called when a X509_STORE_CTX is created.
-		 * 
-		 * This callback is responsible for creating a new store_ctx_data_t and
-		 * attaching it to the newly created context as extra data.
-		 * 
-		 * @param  parent Pointer to the new X509_STORE_CTX structure
-		 * @param  ptr    Garbage data, why is this even here
-		 * @param  ad     Pointer to a CRYPTO_EX_DATA structure
-		 * @param  idx    Index to attach the data to
-		 * @param  argl   User-provided data
-		 * @param  argp   User-provided data
-		 * @return        An ignored value, thanks OpenSSL
-		 */
-		static int store_ctx_data_t_new_func(void *parent, void *ptr, CRYPTO_EX_DATA *ad, int idx, long argl, void *argp);
-		
-		/**
-		 * Called when a X509_STORE_CTX is about to be deleted.
-		 * 
-		 * This callback is responsible for deleting a store_ctx_data_t stored
-		 * as extra data in the context.
-		 * 
-		 * @param parent Pointer to the X509_STORE_CTX structure
-		 * @param ptr    Pointer to the current store_ctx_data_t
-		 * @param ad     Pointer to a CRYPTO_EX_DATA structure
-		 * @param idx    Index the data is attached to
-		 * @param argl   User-provided data
-		 * @param argp   User-provided data
-		 */
-		static void store_ctx_data_t_free_func(void *parent, void *ptr, CRYPTO_EX_DATA *ad, int idx, long argl, void *argp);
 	};
 }
 
