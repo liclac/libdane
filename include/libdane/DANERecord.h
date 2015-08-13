@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <asio/ssl.hpp>
+#include "CertificateStore.h"
 
 namespace libdane
 {
@@ -109,16 +110,16 @@ namespace libdane
 		
 	protected:
 		/// Implementation for verify() with DANERecord::CAConstraints
-		bool verifyCAConstraints(bool preverified, asio::ssl::verify_context &vc) const;
+		bool verifyCAConstraints(bool preverified, CertificateStore store) const;
 		
 		/// Implementation for verify() with DANERecord::ServiceCertificateConstraint
-		bool verifyServiceCertificateConstraint(bool preverified, asio::ssl::verify_context &vc) const;
+		bool verifyServiceCertificateConstraint(bool preverified, CertificateStore store) const;
 		
 		/// Implementation for verify() with DANERecord::TrustAnchorAssertion
-		bool verifyTrustAnchorAssertion(bool preverified, asio::ssl::verify_context &vc) const;
+		bool verifyTrustAnchorAssertion(bool preverified, CertificateStore store) const;
 		
 		/// Implementation for verify() with DANERecord::DomainIssuedCertificate
-		bool verifyDomainIssuedCertificate(bool preverified, asio::ssl::verify_context &vc) const;
+		bool verifyDomainIssuedCertificate(bool preverified, CertificateStore store) const;
 		
 	public:
 		/**

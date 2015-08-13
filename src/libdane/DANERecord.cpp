@@ -38,9 +38,8 @@ std::string DANERecord::dataString() const
 
 bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 {
-	X509_STORE_CTX *ctx = vc.native_handle();
-	X509* cert = X509_STORE_CTX_get_current_cert(ctx);
-	if (!cert) {
+	CertificateStore store(vc);
+	if (!store.currentCert()) {
 		return false;
 	}
 	
@@ -51,13 +50,13 @@ bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 	
 	switch (usage) {
 		case CAConstraints:
-			return verifyCAConstraints(preverified, vc);
+			return verifyCAConstraints(preverified, store);
 		case ServiceCertificateConstraint:
-			return verifyServiceCertificateConstraint(preverified, vc);
+			return verifyServiceCertificateConstraint(preverified, store);
 		case TrustAnchorAssertion:
-			return verifyTrustAnchorAssertion(preverified, vc);
+			return verifyTrustAnchorAssertion(preverified, store);
 		case DomainIssuedCertificate:
-			return verifyDomainIssuedCertificate(preverified, vc);
+			return verifyDomainIssuedCertificate(preverified, store);
 		default:
 			throw std::runtime_error("Invalid certificate usage");
 	}
@@ -117,25 +116,25 @@ std::string DANERecord::toString() const
 	return ss.str();
 }
 
-bool DANERecord::verifyCAConstraints(bool preverified, asio::ssl::verify_context &vc) const
+bool DANERecord::verifyCAConstraints(bool preverified, CertificateStore store) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
 }
 
-bool DANERecord::verifyServiceCertificateConstraint(bool preverified, asio::ssl::verify_context &vc) const
+bool DANERecord::verifyServiceCertificateConstraint(bool preverified, CertificateStore store) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
 }
 
-bool DANERecord::verifyTrustAnchorAssertion(bool preverified, asio::ssl::verify_context &vc) const
+bool DANERecord::verifyTrustAnchorAssertion(bool preverified, CertificateStore store) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
 }
 
-bool DANERecord::verifyDomainIssuedCertificate(bool preverified, asio::ssl::verify_context &vc) const
+bool DANERecord::verifyDomainIssuedCertificate(bool preverified, CertificateStore store) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
