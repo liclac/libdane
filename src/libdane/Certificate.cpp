@@ -38,6 +38,28 @@ Blob Certificate::publicKey() const
 	return blob;
 }
 
+Blob Certificate::encoded() const
+{
+	unsigned char *buf = NULL;
+	int size = i2d_X509(m_x509, &buf);
+	Blob blob(buf, size);
+	free(buf);
+	
+	return blob;
+}
+
+Blob Certificate::select(Selector sel) const
+{
+	switch (sel) {
+		case FullCertificate:
+			return this->encoded();
+		case SubjectPublicKeyInfo:
+			return this->publicKey();
+		default:
+			throw std::runtime_error("Unknown selector");
+	}
+}
+
 
 
 std::string Certificate::nameStr(X509_NAME *name) const

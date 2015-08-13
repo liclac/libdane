@@ -3,6 +3,7 @@
 
 #include <asio/ssl.hpp>
 #include "Blob.h"
+#include "common.h"
 
 namespace libdane
 {
@@ -40,9 +41,22 @@ namespace libdane
 		std::string issuerDN() const;
 		
 		/**
-		 * Returns the public key.
+		 * Returns the certificate's public key.
 		 */
 		Blob publicKey() const;
+		
+		/**
+		 * Returns the DER representation of the certificate.
+		 */
+		Blob encoded() const;
+		
+		/**
+		 * Returns the data matching the given selector.
+		 * 
+		 * @selector Certificate::publicKey()
+		 * @selector Certificate::data()
+		 */
+		Blob select(Selector sel) const;
 		
 		/**
 		 * A certificate is truthy if it has an underlying representation.
