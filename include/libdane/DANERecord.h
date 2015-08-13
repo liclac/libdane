@@ -106,16 +106,16 @@ namespace libdane
 		
 	protected:
 		/// Implementation for verify() with DANERecord::CAConstraints
-		bool verifyCAConstraints(bool preverified, CertificateStore store) const;
+		bool verifyCAConstraints(bool preverified, CertificateStore &store) const;
 		
 		/// Implementation for verify() with DANERecord::ServiceCertificateConstraint
-		bool verifyServiceCertificateConstraint(bool preverified, CertificateStore store) const;
+		bool verifyServiceCertificateConstraint(bool preverified, CertificateStore &store) const;
 		
 		/// Implementation for verify() with DANERecord::TrustAnchorAssertion
-		bool verifyTrustAnchorAssertion(bool preverified, CertificateStore store) const;
+		bool verifyTrustAnchorAssertion(bool preverified, CertificateStore &store) const;
 		
 		/// Implementation for verify() with DANERecord::DomainIssuedCertificate
-		bool verifyDomainIssuedCertificate(bool preverified, CertificateStore store) const;
+		bool verifyDomainIssuedCertificate(bool preverified, CertificateStore &store) const;
 	};
 }
 

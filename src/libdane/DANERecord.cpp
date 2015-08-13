@@ -103,25 +103,25 @@ std::string DANERecord::toString() const
 	return ss.str();
 }
 
-bool DANERecord::verifyCAConstraints(bool preverified, CertificateStore store) const
+bool DANERecord::verifyCAConstraints(bool preverified, CertificateStore &store) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
 }
 
-bool DANERecord::verifyServiceCertificateConstraint(bool preverified, CertificateStore store) const
+bool DANERecord::verifyServiceCertificateConstraint(bool preverified, CertificateStore &store) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
 }
 
-bool DANERecord::verifyTrustAnchorAssertion(bool preverified, CertificateStore store) const
+bool DANERecord::verifyTrustAnchorAssertion(bool preverified, CertificateStore &store) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
 }
 
-bool DANERecord::verifyDomainIssuedCertificate(bool preverified, CertificateStore store) const
+bool DANERecord::verifyDomainIssuedCertificate(bool preverified, CertificateStore &store) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
