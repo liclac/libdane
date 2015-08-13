@@ -123,6 +123,8 @@ bool DANERecord::verifyTrustAnchorAssertion(bool preverified, CertificateStore &
 
 bool DANERecord::verifyDomainIssuedCertificate(bool preverified, CertificateStore &store) const
 {
-	throw std::runtime_error("Not yet implemented!");
-	return false;
+	std::deque<Certificate> chain = store.chain();
+	Certificate &cert = chain.front();
+	Blob match = cert.select(this->selector).match(this->mtype);
+	return match == this->data;
 }
