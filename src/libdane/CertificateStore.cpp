@@ -17,6 +17,9 @@ CertificateStore::CertificateStore(X509_STORE_CTX *ctx):
 CertificateStore::CertificateStore(asio::ssl::verify_context &vc):
 	CertificateStore(vc.native_handle()) {}
 
+CertificateStore::CertificateStore(const CertificateStore &store):
+	CertificateStore(store.ctx()) {}
+
 CertificateStore::~CertificateStore()
 {
 	sk_X509_pop_free(m_chain_stack, X509_free);

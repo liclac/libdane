@@ -35,6 +35,11 @@ namespace libdane
 		CertificateStore(asio::ssl::verify_context &vc);
 		
 		/**
+		 * Copy constructor.
+		 */
+		CertificateStore(const CertificateStore &store);
+		
+		/**
 		 * Destructor.
 		 */
 		virtual ~CertificateStore();
