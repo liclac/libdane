@@ -5,6 +5,7 @@
 #include <vector>
 #include <asio/ssl.hpp>
 #include "CertificateStore.h"
+#include "Blob.h"
 
 namespace libdane
 {
@@ -85,11 +86,6 @@ namespace libdane
 		virtual ~DANERecord();
 		
 		/**
-		 * Returns the record's data as a hexadecimal string.
-		 */
-		std::string dataString() const;
-		
-		/**
 		 * Verifies the presented context against this record.
 		 */
 		bool verify(bool preverified, asio::ssl::verify_context &vc) const;
@@ -106,7 +102,7 @@ namespace libdane
 		Usage usage;						///< Certificate Usage
 		Selector selector;					///< Selector
 		MatchingType mtype;					///< Matching Type
-		std::vector<unsigned char> data;	///< Binary data
+		Blob data;							///< Binary data
 		
 	protected:
 		/// Implementation for verify() with DANERecord::CAConstraints

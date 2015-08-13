@@ -24,16 +24,6 @@ DANERecord::~DANERecord()
 	
 }
 
-std::string DANERecord::dataString() const
-{
-	std::stringstream ss;
-	ss << std::hex << std::setfill('0');
-	for (auto it = data.begin(); it != data.end(); ++it) {
-		ss << std::setw(2) << static_cast<int>(*it);
-	}
-	return ss.str();
-}
-
 bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 {
 	CertificateStore store(vc);
@@ -108,7 +98,7 @@ std::string DANERecord::toString() const
 			break;
 	}
 	
-	ss << ", \"" << dataString() << "\")";
+	ss << ", \"" << data.hex() << "\")";
 	
 	return ss.str();
 }
