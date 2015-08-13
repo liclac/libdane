@@ -2,6 +2,7 @@
 #define LIBDANE_X509_H
 
 #include <asio/ssl.hpp>
+#include "Blob.h"
 
 namespace libdane
 {
@@ -37,6 +38,11 @@ namespace libdane
 		 * Returns the certificate's Issuer Name as a DN string.
 		 */
 		std::string issuerDN() const;
+		
+		/**
+		 * Returns the public key.
+		 */
+		Blob publicKey() const;
 		
 		/**
 		 * A certificate is truthy if it has an underlying representation.

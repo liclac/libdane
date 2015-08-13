@@ -27,6 +27,17 @@ std::string Certificate::issuerDN() const
 	return this->nameStr(X509_get_issuer_name(m_x509));
 }
 
+Blob Certificate::publicKey() const
+{
+	unsigned char *buf = NULL;
+	EVP_PKEY *pkey = X509_get_pubkey(m_x509);
+	int size = i2d_PUBKEY(pkey, &buf);
+	Blob blob(buf, size);
+	free(buf);
+	
+	return blob;
+}
+
 
 
 std::string Certificate::nameStr(X509_NAME *name) const
