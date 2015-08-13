@@ -91,9 +91,9 @@ void DANE::lookupDANE(const std::string &domain, unsigned short port, Protocol p
 			ldns_rdf *mtype_rd = ldns_rr_rdf(rr, 2);
 			ldns_rdf *data_rd = ldns_rr_rdf(rr, 3);
 			
-			DANERecord::Usage usage = static_cast<DANERecord::Usage>(ldns_rdf_data(usage_rd)[0]);
-			DANERecord::Selector selector = static_cast<DANERecord::Selector>(ldns_rdf_data(selector_rd)[0]);
-			DANERecord::MatchingType mtype = static_cast<DANERecord::MatchingType>(ldns_rdf_data(mtype_rd)[0]);
+			Usage usage = static_cast<Usage>(ldns_rdf_data(usage_rd)[0]);
+			Selector selector = static_cast<Selector>(ldns_rdf_data(selector_rd)[0]);
+			MatchingType mtype = static_cast<MatchingType>(ldns_rdf_data(mtype_rd)[0]);
 			uint8_t* data_ptr = ldns_rdf_data(data_rd);
 			std::vector<unsigned char> data(data_ptr, data_ptr + ldns_rdf_size(data_rd));
 			
