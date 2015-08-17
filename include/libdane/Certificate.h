@@ -60,8 +60,8 @@ namespace libdane
 		/**
 		 * Returns the data matching the given selector.
 		 * 
-		 * @selector Certificate::publicKey()
-		 * @selector Certificate::data()
+		 * @see Certificate::publicKey()
+		 * @see Certificate::data()
 		 */
 		Blob select(Selector sel) const;
 		
