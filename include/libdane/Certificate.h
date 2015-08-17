@@ -14,11 +14,18 @@ namespace libdane
 	{
 	public:
 		/**
-		 * Constructor.
+		 * Creates a certificate from an X509 object.
+		 * 
+		 * The certificate is copied, and destroyed with this object.
 		 * 
 		 * @param x509 Underlying representation
 		 */
 		Certificate(X509 *x509 = nullptr);
+		
+		/**
+		 * Copy constructor.
+		 */
+		Certificate(const Certificate &other);
 		
 		/**
 		 * Destructor.

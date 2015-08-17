@@ -3,14 +3,17 @@
 using namespace libdane;
 
 Certificate::Certificate(X509 *x509):
-	m_x509(x509)
+	m_x509(X509_dup(x509))
 {
 	
 }
 
+Certificate::Certificate(const Certificate &other):
+	Certificate(other.x509()) {}
+
 Certificate::~Certificate()
 {
-	
+	X509_free(m_x509);
 }
 
 
