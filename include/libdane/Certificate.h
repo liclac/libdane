@@ -18,6 +18,8 @@ namespace libdane
 		 * 
 		 * The certificate is copied, and destroyed with this object.
 		 * 
+		 * @todo Increment the reference count instead of duplicating
+		 * 
 		 * @param x509 Underlying representation
 		 */
 		Certificate(X509 *x509 = nullptr);
