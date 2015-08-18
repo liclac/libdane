@@ -25,6 +25,13 @@ namespace libdane
 		Certificate(X509 *x509 = nullptr);
 		
 		/**
+		 * Creates a certificate from a PEM string.
+		 * 
+		 * @param pem The PEM-encoded certificate
+		 */
+		Certificate(const std::string &pem);
+		
+		/**
 		 * Copy constructor.
 		 */
 		Certificate(const Certificate &other);

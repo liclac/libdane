@@ -11,6 +11,13 @@ Certificate::Certificate(X509 *x509):
 Certificate::Certificate(const Certificate &other):
 	Certificate(other.x509()) {}
 
+Certificate::Certificate(const std::string &pem)
+{
+	std::vector<char> tmp(pem.data(), pem.data() + pem.size());
+	auto bio = std::shared_ptr<BIO>(BIO_new_mem_buf(static_cast<void*>(tmp.data()), tmp.size()), BIO_free);
+	m_x509 = PEM_read_bio_X509(&*bio, NULL, NULL, NULL);
+}
+
 Certificate::~Certificate()
 {
 	X509_free(m_x509);
