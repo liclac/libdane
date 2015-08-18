@@ -91,3 +91,21 @@ Blob Blob::hash(const EVP_MD *type) const
 	
 	return Blob(buf, len);
 }
+
+std::ostream& libdane::operator<<(std::ostream& stream, const Blob &blob)
+{
+	std::ios::fmtflags flags = stream.flags();
+	stream << std::hex << std::uppercase << std::setfill('0');
+	
+	stream << "Blob({";
+	for (auto it = blob.data().begin(); it != blob.data().end(); ++it) {
+		if (it != blob.data().begin()) {
+			stream << ", ";
+		}
+		stream << "0x" << std::setw(2) << static_cast<int>(*it);
+	}
+	stream << "})";
+
+	stream.flags(flags);
+	return stream;
+}
