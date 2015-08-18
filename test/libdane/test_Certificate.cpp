@@ -16,4 +16,15 @@ SCENARIO ("Accessors work")
 			CHECK(cert.subjectDN() == "/C=US/ST=California/L=Mountain View/O=Google Inc/CN=*.google.com");
 		}
 	}
+	
+	GIVEN ("An empty certificate")
+	{
+		Certificate cert;
+		
+		THEN ("Issuer and Subject should be blank")
+		{
+			CHECK(cert.issuerDN() == "");
+			CHECK(cert.subjectDN() == "");
+		}
+	}
 }

@@ -3,7 +3,7 @@
 using namespace libdane;
 
 Certificate::Certificate(X509 *x509):
-	m_x509(X509_dup(x509))
+	m_x509(x509 ? X509_dup(x509) : NULL)
 {
 	
 }
@@ -20,7 +20,9 @@ Certificate::Certificate(const std::string &pem)
 
 Certificate::~Certificate()
 {
-	X509_free(m_x509);
+	if (m_x509) {
+		X509_free(m_x509);
+	}
 }
 
 
@@ -29,16 +31,28 @@ X509* Certificate::x509() const { return m_x509; }
 
 std::string Certificate::subjectDN() const
 {
+	if (!m_x509) {
+		return std::string();
+	}
+	
 	return this->nameStr(X509_get_subject_name(m_x509));
 }
 
 std::string Certificate::issuerDN() const
 {
+	if (!m_x509) {
+		return std::string();
+	}
+	
 	return this->nameStr(X509_get_issuer_name(m_x509));
 }
 
 Blob Certificate::publicKey() const
 {
+	if (!m_x509) {
+		return Blob();
+	}
+	
 	unsigned char *buf = NULL;
 	EVP_PKEY *pkey = X509_get_pubkey(m_x509);
 	int size = i2d_PUBKEY(pkey, &buf);
@@ -50,6 +64,10 @@ Blob Certificate::publicKey() const
 
 Blob Certificate::encoded() const
 {
+	if (!m_x509) {
+		return Blob();
+	}
+	
 	unsigned char *buf = NULL;
 	int size = i2d_X509(m_x509, &buf);
 	Blob blob(buf, size);
