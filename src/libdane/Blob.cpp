@@ -64,6 +64,8 @@ Blob Blob::match(MatchingType mtype) const
 			return this->sha256();
 		case SHA512:
 			return this->sha512();
+		default:
+			throw std::runtime_error("Unknown MatchingType requested");
 	}
 }
 
