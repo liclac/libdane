@@ -37,3 +37,25 @@ SCENARIO ("Initialization works")
 		}
 	}
 }
+
+SCENARIO ("Hashing works")
+{
+	GIVEN ("A string")
+	{
+		Blob blob("lorem ipsum dolor sit amet");
+		
+		THEN ("Calculated checksums should be correct")
+		{
+			CHECK (blob.sha256().hex() == "2f8586076db2559d3e72a43c4ae8a1f5957abb23ca4a1f46e380dd640536eedb");
+			CHECK (blob.sha512().hex() == "bafa0732d3b1a1d95431bd6fff46b35ac6b60c64ac8ea8b11cb05f7c1a706469aa04c181172bd5e303c3a1f19eef35469500fe9866e6b4c7bbc12759fee8e735");
+		}
+		
+		THEN ("A match() should always return the correct value")
+		{
+			CHECK (blob.match(libdane::ExactMatch) == blob);
+			CHECK (blob.match(libdane::SHA256) == blob.sha256());
+			CHECK (blob.match(libdane::SHA512) == blob.sha512());
+			CHECK_THROWS_AS (blob.match(static_cast<MatchingType>(255)), std::runtime_error);
+		}
+	}
+}
