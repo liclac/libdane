@@ -23,3 +23,17 @@ SCENARIO ("Formatting of binary data works")
 		}
 	}
 }
+
+SCENARIO ("Initialization works")
+{
+	GIVEN ("A string")
+	{
+		Blob blob("test");
+		
+		THEN ("Only the characters should be stored")
+		{
+			REQUIRE (blob.data().size() == 4);
+			REQUIRE (blob.hex() == "74657374");
+		}
+	}
+}

@@ -22,6 +22,12 @@ Blob::Blob(const std::vector<unsigned char> &data):
 	
 }
 
+Blob::Blob(const char *str):
+	Blob(reinterpret_cast<const unsigned char*>(str), std::strlen(str))
+{
+	
+}
+
 Blob::~Blob()
 {
 	

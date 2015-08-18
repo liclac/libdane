@@ -29,6 +29,11 @@ namespace libdane
 		Blob(const std::vector<unsigned char> &data);
 		
 		/**
+		 * Constructs a blob by copying a string.
+		 */
+		Blob(const char *str);
+		
+		/**
 		 * Destructor.
 		 */
 		virtual ~Blob();
