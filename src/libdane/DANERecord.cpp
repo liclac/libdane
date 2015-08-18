@@ -13,8 +13,8 @@ DANERecord::DANERecord()
 	
 }
 
-DANERecord::DANERecord(Usage usage, Selector selector, MatchingType mtype, std::vector<unsigned char> data):
-	usage(usage), selector(selector), mtype(mtype), data(data)
+DANERecord::DANERecord(Usage usage, Selector selector, MatchingType matching, std::vector<unsigned char> data):
+	m_usage(usage), m_selector(selector), m_matching(matching), m_data(data)
 {
 	
 }
@@ -35,7 +35,7 @@ bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 		return true;
 	}
 	
-	switch (usage) {
+	switch (m_usage) {
 		case CAConstraints:
 			return verifyCAConstraints(preverified, store);
 		case ServiceCertificateConstraint:
@@ -56,7 +56,7 @@ std::string DANERecord::toString() const
 	std::stringstream ss;
 	ss << "DANERecord(";
 	
-	switch (usage) {
+	switch (m_usage) {
 		case CAConstraints:
 			ss << "CAConstraints";
 			break;
@@ -75,7 +75,7 @@ std::string DANERecord::toString() const
 	
 	ss << ", ";
 	
-	switch (selector) {
+	switch (m_selector) {
 		case FullCertificate:
 			ss << "FullCertificate";
 			break;
@@ -86,7 +86,7 @@ std::string DANERecord::toString() const
 	
 	ss << ", ";
 	
-	switch (mtype) {
+	switch (m_matching) {
 		case ExactMatch:
 			ss << "ExactMatch";
 			break;
@@ -98,10 +98,26 @@ std::string DANERecord::toString() const
 			break;
 	}
 	
-	ss << ", \"" << data.hex() << "\")";
+	ss << ", \"" << m_data.hex() << "\")";
 	
 	return ss.str();
 }
+
+
+
+Usage DANERecord::usage() const { return m_usage; }
+void DANERecord::setUsage(Usage v) { m_usage = v; }
+
+Selector DANERecord::selector() const { return m_selector; }
+void DANERecord::setSelector(Selector v) { m_selector = v; }
+
+MatchingType DANERecord::matching() const { return m_matching; }
+void DANERecord::setMatching(MatchingType v) { m_matching = v; }
+
+Blob DANERecord::data() const { return m_data; }
+void DANERecord::setData(Blob v) { m_data = v; }
+
+
 
 bool DANERecord::verifyCAConstraints(bool preverified, CertificateStore &store) const
 {
@@ -125,6 +141,6 @@ bool DANERecord::verifyDomainIssuedCertificate(bool preverified, CertificateStor
 {
 	std::deque<Certificate> chain = store.chain();
 	Certificate &cert = chain.front();
-	Blob match = cert.select(this->selector).match(this->mtype);
-	return match == this->data;
+	Blob match = cert.select(m_selector).match(m_matching);
+	return match == m_data;
 }

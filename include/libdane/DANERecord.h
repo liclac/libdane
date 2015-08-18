@@ -24,7 +24,7 @@ namespace libdane
 		/**
 		 * Constructs a DANE record with the given values.
 		 */
-		DANERecord(Usage usage, Selector selector, MatchingType mtype, std::vector<unsigned char> data);
+		DANERecord(Usage usage, Selector selector, MatchingType matching, std::vector<unsigned char> data);
 		
 		/**
 		 * Destructor.
@@ -45,10 +45,17 @@ namespace libdane
 		
 		
 		
-		Usage usage;						///< Certificate Usage
-		Selector selector;					///< Selector
-		MatchingType mtype;					///< Matching Type
-		Blob data;							///< Binary data
+		Usage usage() const;				///< Certificate Usage
+		void setUsage(Usage v);				///< Sets usage()
+		
+		Selector selector() const;			///< Selector
+		void setSelector(Selector v);		///< Sets selector()
+		
+		MatchingType matching() const;		///< Matching Type
+		void setMatching(MatchingType v);	///< Sets matching()
+		
+		Blob data() const;					///< Binary data
+		void setData(Blob v);				///< Sets data()
 		
 	protected:
 		/// Implementation for verify() with DANERecord::CAConstraints
@@ -62,6 +69,12 @@ namespace libdane
 		
 		/// Implementation for verify() with DANERecord::DomainIssuedCertificate
 		bool verifyDomainIssuedCertificate(bool preverified, CertificateStore &store) const;
+		
+	private:
+		Usage m_usage;
+		Selector m_selector;
+		MatchingType m_matching;
+		Blob m_data;
 	};
 }
 
