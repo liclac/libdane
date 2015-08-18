@@ -1,5 +1,5 @@
-#ifndef LIBDANE_CERTIFICATESTORE_H
-#define LIBDANE_CERTIFICATESTORE_H
+#ifndef LIBDANE_VERIFYCONTEXT_H
+#define LIBDANE_VERIFYCONTEXT_H
 
 #include "Certificate.h"
 #include <asio/ssl.hpp>
@@ -17,7 +17,7 @@ namespace libdane
 	 * 
 	 * \todo Make Certificate retain native representations instead.
 	 */
-	class CertificateStore
+	class VerifyContext
 	{
 	public:
 		/**
@@ -25,24 +25,24 @@ namespace libdane
 		 * 
 		 * @param ctx Underlying context
 		 */
-		CertificateStore(X509_STORE_CTX *ctx = nullptr);
+		VerifyContext(X509_STORE_CTX *ctx = nullptr);
 		
 		/**
 		 * Convenience constructor.
 		 * 
-		 * This is the same as calling `CertificateStore(vc.native_handle())`.
+		 * This is the same as calling `VerifyContext(vc.native_handle())`.
 		 */
-		CertificateStore(asio::ssl::verify_context &vc);
+		VerifyContext(asio::ssl::verify_context &vc);
 		
 		/**
 		 * Copy constructor.
 		 */
-		CertificateStore(const CertificateStore &store);
+		VerifyContext(const VerifyContext &store);
 		
 		/**
 		 * Destructor.
 		 */
-		virtual ~CertificateStore();
+		virtual ~VerifyContext();
 		
 		/**
 		 * Returns the underlying context for the store.
@@ -88,14 +88,14 @@ namespace libdane
 		 * Structure for extra data.
 		 * 
 		 * One of these are automatically inserted into new X509_STORE_CTX
-		 * instances, and can be retrieved with CertificateStore::data();
+		 * instances, and can be retrieved with VerifyContext::data();
 		 */
 		struct ctx_data_t {
 			bool pass_all_checks = false;	///< Pass all following checks
 		};
 		
 		/**
-		 * Attachment index for a CertificateStore::ctx_data_t.
+		 * Attachment index for a VerifyContext::ctx_data_t.
 		 */
 		static int ctx_data_idx;
 		

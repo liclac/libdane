@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <asio/ssl.hpp>
-#include "CertificateStore.h"
+#include "VerifyContext.h"
 #include "Blob.h"
 #include "common.h"
 
@@ -59,16 +59,16 @@ namespace libdane
 		
 	protected:
 		/// Implementation for verify() with DANERecord::CAConstraints
-		bool verifyCAConstraints(bool preverified, CertificateStore &store) const;
+		bool verifyCAConstraints(bool preverified, VerifyContext &ctx) const;
 		
 		/// Implementation for verify() with DANERecord::ServiceCertificateConstraint
-		bool verifyServiceCertificateConstraint(bool preverified, CertificateStore &store) const;
+		bool verifyServiceCertificateConstraint(bool preverified, VerifyContext &ctx) const;
 		
 		/// Implementation for verify() with DANERecord::TrustAnchorAssertion
-		bool verifyTrustAnchorAssertion(bool preverified, CertificateStore &store) const;
+		bool verifyTrustAnchorAssertion(bool preverified, VerifyContext &ctx) const;
 		
 		/// Implementation for verify() with DANERecord::DomainIssuedCertificate
-		bool verifyDomainIssuedCertificate(bool preverified, CertificateStore &store) const;
+		bool verifyDomainIssuedCertificate(bool preverified, VerifyContext &ctx) const;
 		
 	private:
 		Usage m_usage;

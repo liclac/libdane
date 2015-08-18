@@ -26,24 +26,24 @@ DANERecord::~DANERecord()
 
 bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 {
-	CertificateStore store(vc);
-	if (!store.currentCert()) {
+	VerifyContext ctx(vc);
+	if (!ctx.currentCert()) {
 		return false;
 	}
 	
-	if (store.shouldPassAllChecks()) {
+	if (ctx.shouldPassAllChecks()) {
 		return true;
 	}
 	
 	switch (m_usage) {
 		case CAConstraints:
-			return verifyCAConstraints(preverified, store);
+			return verifyCAConstraints(preverified, ctx);
 		case ServiceCertificateConstraint:
-			return verifyServiceCertificateConstraint(preverified, store);
+			return verifyServiceCertificateConstraint(preverified, ctx);
 		case TrustAnchorAssertion:
-			return verifyTrustAnchorAssertion(preverified, store);
+			return verifyTrustAnchorAssertion(preverified, ctx);
 		case DomainIssuedCertificate:
-			return verifyDomainIssuedCertificate(preverified, store);
+			return verifyDomainIssuedCertificate(preverified, ctx);
 		default:
 			throw std::runtime_error("Invalid certificate usage");
 	}
@@ -119,27 +119,27 @@ void DANERecord::setData(Blob v) { m_data = v; }
 
 
 
-bool DANERecord::verifyCAConstraints(bool preverified, CertificateStore &store) const
+bool DANERecord::verifyCAConstraints(bool preverified, VerifyContext &ctx) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
 }
 
-bool DANERecord::verifyServiceCertificateConstraint(bool preverified, CertificateStore &store) const
+bool DANERecord::verifyServiceCertificateConstraint(bool preverified, VerifyContext &ctx) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
 }
 
-bool DANERecord::verifyTrustAnchorAssertion(bool preverified, CertificateStore &store) const
+bool DANERecord::verifyTrustAnchorAssertion(bool preverified, VerifyContext &ctx) const
 {
 	throw std::runtime_error("Not yet implemented!");
 	return false;
 }
 
-bool DANERecord::verifyDomainIssuedCertificate(bool preverified, CertificateStore &store) const
+bool DANERecord::verifyDomainIssuedCertificate(bool preverified, VerifyContext &ctx) const
 {
-	std::deque<Certificate> chain = store.chain();
+	std::deque<Certificate> chain = ctx.chain();
 	Certificate &cert = chain.front();
 	Blob match = cert.select(m_selector).match(m_matching);
 	return match == m_data;
