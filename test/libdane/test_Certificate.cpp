@@ -4,24 +4,24 @@
 
 using namespace libdane;
 
-SCENARIO ("Accessors work")
+SCENARIO("Accessors work")
 {
-	GIVEN ("The certificate for google.com")
+	GIVEN("The certificate for google.com")
 	{
 		Certificate cert(resources::googlePEM);
 		
-		THEN ("Issuer and Subject should be correct")
+		THEN("Issuer and Subject should be correct")
 		{
 			CHECK(cert.issuerDN() == "/C=US/O=Google Inc/CN=Google Internet Authority G2");
 			CHECK(cert.subjectDN() == "/C=US/ST=California/L=Mountain View/O=Google Inc/CN=*.google.com");
 		}
 	}
 	
-	GIVEN ("An empty certificate")
+	GIVEN("An empty certificate")
 	{
 		Certificate cert;
 		
-		THEN ("Issuer and Subject should be blank")
+		THEN("Issuer and Subject should be blank")
 		{
 			CHECK(cert.issuerDN() == "");
 			CHECK(cert.subjectDN() == "");
