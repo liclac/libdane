@@ -24,6 +24,39 @@ SCENARIO("Formatting of binary data works")
 	}
 }
 
+SCENARIO("Decoding of hex strings works")
+{
+	GIVEN("0x1337")
+	{
+		Blob blob = Blob::fromHex("1337");
+		
+		THEN("The hex string should be 1337")
+		{
+			REQUIRE(blob.hex() == "1337");
+		}
+	}
+	
+	GIVEN("0xF00D")
+	{
+		Blob blob = Blob::fromHex("F00D");
+		
+		THEN("The hex string should be f00d")
+		{
+			REQUIRE(blob.hex() == "f00d");
+		}
+	}
+	
+	GIVEN("Garbage data")
+	{
+		Blob blob = Blob::fromHex("lorem ipsum dolor sit amet");
+		
+		THEN("The resulting blob should be full of zeroes, not crash")
+		{
+			REQUIRE(blob.hex() == "00000000000000000000000000");
+		}
+	}
+}
+
 SCENARIO("Initialization works")
 {
 	GIVEN("A string")

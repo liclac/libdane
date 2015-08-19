@@ -14,6 +14,16 @@ namespace libdane
 	{
 	public:
 		/**
+		 * Creates a Blob from a hexadecimal string.
+		 * 
+		 * @warning The string must NOT have a "0x" prefix!
+		 * 
+		 * @param  str A hexadecimal string
+		 * @return     A blob
+		 */
+		static Blob fromHex(const std::string &str);
+		
+		/**
 		 * Default constructor.
 		 */
 		Blob();

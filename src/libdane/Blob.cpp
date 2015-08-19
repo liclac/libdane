@@ -5,6 +5,24 @@
 
 using namespace libdane;
 
+Blob Blob::fromHex(const std::string &str)
+{
+	std::vector<unsigned char> data;
+	std::stringstream ss;
+	for (int offset = 0; offset < str.size(); offset += 2) {
+		ss.clear();
+		ss << std::hex << str.substr(offset, 2);
+		
+		unsigned int tmp;
+		ss >> tmp;
+		data.push_back(static_cast<unsigned char>(tmp));
+	}
+	
+	return Blob(data);
+}
+
+
+
 Blob::Blob()
 {
 	
