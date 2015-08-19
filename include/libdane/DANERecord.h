@@ -24,7 +24,7 @@ namespace libdane
 		/**
 		 * Constructs a DANE record with the given values.
 		 */
-		DANERecord(Usage usage, Selector selector, MatchingType matching, std::vector<unsigned char> data);
+		DANERecord(Usage usage, Selector selector, MatchingType matching, Blob data);
 		
 		/**
 		 * Destructor.

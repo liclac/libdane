@@ -13,7 +13,7 @@ DANERecord::DANERecord()
 	
 }
 
-DANERecord::DANERecord(Usage usage, Selector selector, MatchingType matching, std::vector<unsigned char> data):
+DANERecord::DANERecord(Usage usage, Selector selector, MatchingType matching, Blob data):
 	m_usage(usage), m_selector(selector), m_matching(matching), m_data(data)
 {
 	
