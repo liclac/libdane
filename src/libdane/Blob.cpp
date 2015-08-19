@@ -78,9 +78,9 @@ Blob Blob::match(MatchingType mtype) const
 	switch (mtype) {
 		case ExactMatch:
 			return Blob(m_data);
-		case SHA256:
+		case SHA256Hash:
 			return this->sha256();
-		case SHA512:
+		case SHA512Hash:
 			return this->sha512();
 		default:
 			throw std::runtime_error("Unknown MatchingType requested");

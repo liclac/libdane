@@ -90,11 +90,11 @@ std::string DANERecord::toString() const
 		case ExactMatch:
 			ss << "ExactMatch";
 			break;
-		case SHA256:
-			ss << "SHA256";
+		case SHA256Hash:
+			ss << "SHA256Hash";
 			break;
-		case SHA512:
-			ss << "SHA512";
+		case SHA512Hash:
+			ss << "SHA512Hash";
 			break;
 	}
 	

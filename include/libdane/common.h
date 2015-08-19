@@ -52,8 +52,8 @@ namespace libdane
 	 */
 	enum MatchingType {
 		ExactMatch = 0,				///< Exact contents match
-		SHA256 = 1,					///< SHA-256 checksums match
-		SHA512 = 2,					///< SHA-512 checksums match
+		SHA256Hash = 1,				///< SHA-256 checksums match
+		SHA512Hash = 2,				///< SHA-512 checksums match
 	};
 }
 

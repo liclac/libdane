@@ -85,9 +85,9 @@ SCENARIO("Hashing works")
 		
 		THEN("A match() should always return the correct value")
 		{
-			CHECK(blob.match(libdane::ExactMatch) == blob);
-			CHECK(blob.match(libdane::SHA256) == blob.sha256());
-			CHECK(blob.match(libdane::SHA512) == blob.sha512());
+			CHECK(blob.match(ExactMatch) == blob);
+			CHECK(blob.match(SHA256Hash) == blob.sha256());
+			CHECK(blob.match(SHA512Hash) == blob.sha512());
 			CHECK_THROWS_AS(blob.match(static_cast<MatchingType>(255)), std::runtime_error);
 		}
 	}
