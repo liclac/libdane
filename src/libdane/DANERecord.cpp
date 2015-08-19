@@ -24,6 +24,22 @@ DANERecord::~DANERecord()
 	
 }
 
+DANERecord::VerifyResult DANERecord::verify(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
+{
+	switch (m_usage) {
+		case CAConstraints:
+			return verifyCAConstraints(preverified, cert, chain);
+		case ServiceCertificateConstraint:
+			return verifyServiceCertificateConstraint(preverified, cert, chain);
+		case TrustAnchorAssertion:
+			return verifyTrustAnchorAssertion(preverified, cert, chain);
+		case DomainIssuedCertificate:
+			return verifyDomainIssuedCertificate(preverified, cert, chain);
+		default:
+			throw std::runtime_error("Invalid certificate usage");
+	}
+}
+
 bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 {
 	VerifyContext ctx(vc);
@@ -35,20 +51,21 @@ bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 		return true;
 	}
 	
-	switch (m_usage) {
-		case CAConstraints:
-			return verifyCAConstraints(preverified, ctx);
-		case ServiceCertificateConstraint:
-			return verifyServiceCertificateConstraint(preverified, ctx);
-		case TrustAnchorAssertion:
-			return verifyTrustAnchorAssertion(preverified, ctx);
-		case DomainIssuedCertificate:
-			return verifyDomainIssuedCertificate(preverified, ctx);
-		default:
-			throw std::runtime_error("Invalid certificate usage");
-	}
+	Certificate cert = ctx.currentCert();
+	std::deque<Certificate> chain = ctx.chain();
+	VerifyResult result = verify(preverified, cert, chain);
 	
-	return false;
+	switch (result) {;
+		case Fail:
+			return false;
+		case Pass:
+			return true;
+		case PassAll:
+			ctx.setShouldPassAllChecks(true);
+			return true;
+		default:
+			throw std::runtime_error("Invalid verification result");
+	}
 }
 
 std::string DANERecord::toString() const
@@ -119,28 +136,27 @@ void DANERecord::setData(Blob v) { m_data = v; }
 
 
 
-bool DANERecord::verifyCAConstraints(bool preverified, VerifyContext &ctx) const
+DANERecord::VerifyResult DANERecord::verifyCAConstraints(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
 	throw std::runtime_error("Not yet implemented!");
-	return false;
+	return Fail;
 }
 
-bool DANERecord::verifyServiceCertificateConstraint(bool preverified, VerifyContext &ctx) const
+DANERecord::VerifyResult DANERecord::verifyServiceCertificateConstraint(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
 	throw std::runtime_error("Not yet implemented!");
-	return false;
+	return Fail;
 }
 
-bool DANERecord::verifyTrustAnchorAssertion(bool preverified, VerifyContext &ctx) const
+DANERecord::VerifyResult DANERecord::verifyTrustAnchorAssertion(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
 	throw std::runtime_error("Not yet implemented!");
-	return false;
+	return Fail;
 }
 
-bool DANERecord::verifyDomainIssuedCertificate(bool preverified, VerifyContext &ctx) const
+DANERecord::VerifyResult DANERecord::verifyDomainIssuedCertificate(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
-	std::deque<Certificate> chain = ctx.chain();
-	Certificate &cert = chain.front();
-	Blob match = cert.select(m_selector).match(m_matching);
-	return match == m_data;
+	const Certificate &domainCert = chain.front();
+	Blob match = domainCert.select(m_selector).match(m_matching);
+	return match == m_data ? PassAll : Fail;
 }
