@@ -1,6 +1,26 @@
 #include <libdane/Certificate.h>
+#include <regex>
 
 using namespace libdane;
+
+std::deque<Certificate> Certificate::parsePEM(const std::string &pem)
+{
+	static std::regex pemex("([-]+BEGIN CERTIFICATE[-]+\\n[A-Za-z0-9\\+\\/\n\\=]+\\n[-]+END CERTIFICATE[-]+)");
+	
+	std::deque<Certificate> certs;
+	
+	auto begin = std::sregex_iterator(pem.begin(), pem.end(), pemex);
+	auto end = std::sregex_iterator();
+	for (auto it = begin; it != end; ++it) {
+		std::smatch match = *it;
+		std::string str = match.str();
+		certs.emplace_back(str);
+	}
+	
+	return certs;
+}
+
+
 
 Certificate::Certificate(X509 *x509):
 	m_x509(x509 ? X509_dup(x509) : NULL)

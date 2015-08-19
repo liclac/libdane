@@ -50,3 +50,23 @@ SCENARIO("Accessors work")
 		}
 	}
 }
+
+SCENARIO("PEM parsing works")
+{
+	GIVEN("The certificate chain for google.com")
+	{
+		std::deque<Certificate> certs = Certificate::parsePEM(resources::googlePEM);
+		
+		THEN("The size should be correct")
+		{
+			REQUIRE(certs.size() == 3);
+		}
+		
+		THEN("The certificates in it should be correct")
+		{
+			CHECK(certs[0].subjectDN() == "/C=US/ST=California/L=Mountain View/O=Google Inc/CN=*.google.com");
+			CHECK(certs[1].subjectDN() == "/C=US/O=Google Inc/CN=Google Internet Authority G2");
+			CHECK(certs[2].subjectDN() == "/C=US/O=GeoTrust Inc./CN=GeoTrust Global CA");
+		}
+	}
+}

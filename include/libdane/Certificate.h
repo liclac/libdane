@@ -4,6 +4,7 @@
 #include <asio/ssl.hpp>
 #include "Blob.h"
 #include "common.h"
+#include <deque>
 
 namespace libdane
 {
@@ -13,6 +14,17 @@ namespace libdane
 	class Certificate
 	{
 	public:
+		/**
+		 * Parses a PEM file into a list of Certificates.
+		 * 
+		 * A PEM file can contain multiple certificates, but only one at a time
+		 * can be parsed. This is a convenience function that splits a PEM file
+		 * into multiple pieces and parses each one.
+		 * 
+		 * @param pem A PEM-encoded certificate or certificate chain
+		 */
+		static std::deque<Certificate> parsePEM(const std::string &pem);
+		
 		/**
 		 * Creates a certificate from an X509 object.
 		 * 
