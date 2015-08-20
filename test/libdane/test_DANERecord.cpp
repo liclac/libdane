@@ -5,7 +5,47 @@
 
 using namespace libdane;
 
-SCENARIO("Verifying records works")
+SCENARIO("Lone certificates can be verified")
+{
+	Certificate cert = Certificate::parsePEM(resources::googlePEM).front();
+	DANERecord rec(DomainIssuedCertificate, FullCertificate, ExactMatch, cert.encoded());
+	
+	WHEN("Different selectors are used")
+	{
+		GIVEN("Full Certificate")
+		{
+			rec.setSelector(FullCertificate);
+			rec.setData(cert.encoded());
+			CHECK(rec.verify(cert));
+		}
+		
+		GIVEN("Public Key")
+		{
+			rec.setSelector(SubjectPublicKeyInfo);
+			rec.setData(cert.publicKey());
+			CHECK(rec.verify(cert));
+		}
+	}
+	
+	WHEN("Different matching types are used")
+	{
+		GIVEN("SHA256Hash")
+		{
+			rec.setMatching(SHA256Hash);
+			rec.setData(rec.data().sha256());
+			CHECK(rec.verify(cert));
+		}
+		
+		GIVEN("SHA512Hash")
+		{
+			rec.setMatching(SHA512Hash);
+			rec.setData(rec.data().sha512());
+			CHECK(rec.verify(cert));
+		}
+	}
+}
+
+SCENARIO("Certificate chains can be verified")
 {
 	GIVEN("The certificate chain for google.com")
 	{
