@@ -70,3 +70,19 @@ SCENARIO("PEM parsing works")
 		}
 	}
 }
+
+SCENARIO("Operators work")
+{
+	GIVEN("Two certificates")
+	{
+		std::deque<Certificate> certs = Certificate::parsePEM(resources::googlePEM);
+		const Certificate &a = certs[0];
+		const Certificate &b = certs[1];
+		
+		THEN("The == and != operators should work")
+		{
+			REQUIRE(a == a);
+			REQUIRE(a != b);
+		}
+	}
+}

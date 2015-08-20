@@ -91,6 +91,14 @@ namespace libdane
 		 */
 		explicit operator bool() const { return m_x509 != nullptr; };
 		
+		/**
+		 * Two certificates are equal if the underlying certs are.
+		 */
+		inline bool operator==(const Certificate &other) const { return X509_cmp(m_x509, other.x509()) == 0; };
+		
+		/// Negated operator==
+		inline bool operator!=(const Certificate &other) const { return !(*this == other); };
+		
 	protected:
 		/**
 		 * Turns an X509_NAME* into a string.
