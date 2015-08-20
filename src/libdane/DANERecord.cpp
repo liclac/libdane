@@ -48,7 +48,7 @@ bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 	}
 	
 	if (ctx.shouldPassAllChecks()) {
-		return true;
+		return preverified;
 	}
 	
 	Certificate cert = ctx.currentCert();
