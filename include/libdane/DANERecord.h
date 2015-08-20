@@ -78,6 +78,14 @@ namespace libdane
 		bool verify(bool preverified, asio::ssl::verify_context &vc) const;
 		
 		/**
+		 * Verifies a given certificate against the record's data.
+		 * 
+		 * @param  cert A certificate to verify
+		 * @return      Whether the verification passed or not
+		 */
+		bool verify(const Certificate &cert) const;
+		
+		/**
 		 * Returns a human-readable representation of the record.
 		 * 
 		 * This is not standardized, and meant only for debugging purposes.

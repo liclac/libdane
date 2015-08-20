@@ -68,6 +68,11 @@ bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 	}
 }
 
+bool DANERecord::verify(const Certificate &cert) const
+{
+	return cert.select(m_selector).match(m_matching) == m_data;
+}
+
 std::string DANERecord::toString() const
 {
 	std::stringstream ss;
