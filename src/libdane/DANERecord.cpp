@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <memory>
 #include <functional>
+#include <algorithm>
 
 using namespace libdane;
 using namespace std::placeholders;
@@ -146,25 +147,46 @@ void DANERecord::setData(Blob v) { m_data = v; }
 
 DANERecord::VerifyResult DANERecord::verifyCAConstraints(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
-	throw std::runtime_error("Not yet implemented!");
-	return Fail;
+	// Reject untrusted certificates
+	if (!preverified) {
+		return Fail;
+	}
+	
+	return this->verifyTrustAnchorAssertion(preverified, cert, chain);
 }
 
 DANERecord::VerifyResult DANERecord::verifyServiceCertificateConstraint(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
-	throw std::runtime_error("Not yet implemented!");
-	return Fail;
+	// Reject untrusted certificates
+	if (!preverified) {
+		return Fail;
+	}
+	
+	return this->verifyDomainIssuedCertificate(preverified, cert, chain);
 }
 
 DANERecord::VerifyResult DANERecord::verifyTrustAnchorAssertion(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
-	throw std::runtime_error("Not yet implemented!");
-	return Fail;
+	auto it = std::find(chain.begin(), chain.end(), cert);
+	if (it == chain.end()) {
+		// The certificate isn't even in the chain, wtf
+		return Fail;
+	} else if (it != chain.end() - 1) {
+		// Verify that the current cert was in fact issued by the previous cert
+		const Certificate &prev = *(it + 1);
+		return cert.verify(prev) ? Pass : Fail;
+	}
+	
+	// It's the root certificate; verify it against the record
+	return this->verify(cert) ? Pass : Fail;
 }
 
 DANERecord::VerifyResult DANERecord::verifyDomainIssuedCertificate(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
-	const Certificate &domainCert = chain.front();
-	Blob match = domainCert.select(m_selector).match(m_matching);
-	return match == m_data ? PassAll : Fail;
+	// Fast-forward to the final (front) certificate in the chain
+	if (cert != chain.front()) {
+		return Pass;
+	}
+	
+	return this->verify(cert) ? Pass : Fail;
 }

@@ -5,6 +5,10 @@
 
 using namespace libdane;
 
+constexpr DANERecord::VerifyResult Fail = DANERecord::Fail;
+constexpr DANERecord::VerifyResult Pass = DANERecord::Pass;
+constexpr DANERecord::VerifyResult PassAll = DANERecord::PassAll;
+
 SCENARIO("Lone certificates can be verified")
 {
 	Certificate cert = Certificate::parsePEM(resources::googlePEM).front();
@@ -40,36 +44,60 @@ SCENARIO("Lone certificates can be verified")
 	}
 }
 
-SCENARIO("Certificate chains can be verified")
+SCENARIO("Certificates can be verified, callback-style")
 {
-	GIVEN("The certificate chain for google.com")
+	std::deque<Certificate> chain = Certificate::parsePEM(resources::googlePEM);
+	REQUIRE(chain.size() == 3);
+	
+	std::deque<Certificate> other = Certificate::parsePEM(resources::microsoftPEM);
+	REQUIRE(other.size() == 2);
+	
+	GIVEN("A DomainIssuedCertificate record")
 	{
-		std::deque<Certificate> chain = Certificate::parsePEM(resources::googlePEM);
-		const Certificate &cert = chain.back();
+		DANERecord rec(DomainIssuedCertificate, FullCertificate, SHA256Hash, chain[0]);
 		
-		GIVEN("A passing DomainIssuedCertificate record")
+		THEN("A correct chain should pass verification")
 		{
-			DANERecord rec(DomainIssuedCertificate, FullCertificate, SHA256Hash, chain.front().select(FullCertificate).match(SHA256Hash));
+			CHECK(rec.verify(true, chain[2], chain) == Pass);
+			CHECK(rec.verify(true, chain[1], chain) == Pass);
+			CHECK(rec.verify(true, chain[0], chain) == Pass);
 			
-			THEN("Verification should succeed")
+			THEN("Preverification is ignored")
 			{
-				CHECK(rec.verify(true, cert, chain) == DANERecord::PassAll);
-			}
-			
-			THEN("Preverification should be ignored")
-			{
-				CHECK(rec.verify(false, cert, chain) == DANERecord::PassAll);
+				CHECK(rec.verify(false, chain[0], chain) == Pass);
 			}
 		}
 		
-		GIVEN("A failing DomainIssuedCertificate record")
+		THEN("An invalid chain should fail at the last step")
 		{
-			// Note the mismatched hash algorithm
-			DANERecord rec(DomainIssuedCertificate, FullCertificate, SHA256Hash, chain.front().select(FullCertificate).match(SHA512Hash));
+			CHECK(rec.verify(true, other[1], other) == Pass);
+			CHECK(rec.verify(true, other[0], other) == Fail);
+		}
+	}
+	
+	GIVEN("A TrustAnchorAssertion record")
+	{
+		DANERecord rec(TrustAnchorAssertion, FullCertificate, SHA256Hash, chain[2]);
+		
+		THEN("A correctly issued root certificate should pass verification")
+		{
+			CHECK(rec.verify(true, chain[2], chain) == Pass);
+			CHECK(rec.verify(true, chain[1], chain) == Pass);
+			CHECK(rec.verify(true, chain[0], chain) == Pass);
 			
-			THEN("Verification should fail")
+			THEN("Preverification is ignored")
 			{
-				CHECK(rec.verify(false, cert, chain) == DANERecord::Fail);
+				CHECK(rec.verify(false, chain[2], chain) == Pass);
+			}
+		}
+		
+		THEN("A chain with a different root should fail verification")
+		{
+			CHECK(rec.verify(true, other[1], other) == Fail);
+			
+			THEN("A valid continued chain should pass (should never happen)")
+			{
+				CHECK(rec.verify(true, other[0], other) == Pass);
 			}
 		}
 	}
