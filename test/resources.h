@@ -6,6 +6,7 @@ namespace libdane
 	namespace resources
 	{
 		extern const char *googlePEM;
+		extern const char *microsoftPEM;
 	}
 }
 
