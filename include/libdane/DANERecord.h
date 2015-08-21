@@ -40,16 +40,6 @@ namespace libdane
 		virtual ~DANERecord();
 		
 		/**
-		 * Verifies the presented certificate and chain against this record.
-		 * 
-		 * @param  preverified Is the certificate trusted by the system?
-		 * @param  cert        Current certificate to process
-		 * @param  chain       Full certificate chain
-		 * @return             A verification result
-		 */
-		bool verify(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
-		
-		/**
 		 * Verifies the presented context against this record.
 		 * 
 		 * This is a convenience function for easily using records to verify
@@ -60,6 +50,16 @@ namespace libdane
 		 * @return             Whether the verification passed or not
 		 */
 		bool verify(bool preverified, asio::ssl::verify_context &vc) const;
+		
+		/**
+		 * Verifies the presented certificate and chain against this record.
+		 * 
+		 * @param  preverified Is the certificate trusted by the system?
+		 * @param  cert        Current certificate to process
+		 * @param  chain       Full certificate chain
+		 * @return             A verification result
+		 */
+		bool verify(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
 		
 		/**
 		 * Verifies a given certificate against the record's data.

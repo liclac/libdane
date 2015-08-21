@@ -28,22 +28,6 @@ DANERecord::~DANERecord()
 	
 }
 
-bool DANERecord::verify(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
-{
-	switch (m_usage) {
-		case CAConstraints:
-			return verifyCAConstraints(preverified, cert, chain);
-		case ServiceCertificateConstraint:
-			return verifyServiceCertificateConstraint(preverified, cert, chain);
-		case TrustAnchorAssertion:
-			return verifyTrustAnchorAssertion(preverified, cert, chain);
-		case DomainIssuedCertificate:
-			return verifyDomainIssuedCertificate(preverified, cert, chain);
-		default:
-			throw std::runtime_error("Invalid certificate usage");
-	}
-}
-
 bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 {
 	VerifyContext ctx(vc);
@@ -67,6 +51,22 @@ bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 	}
 	
 	return verify(preverified, cert, chain);
+}
+
+bool DANERecord::verify(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
+{
+	switch (m_usage) {
+		case CAConstraints:
+			return verifyCAConstraints(preverified, cert, chain);
+		case ServiceCertificateConstraint:
+			return verifyServiceCertificateConstraint(preverified, cert, chain);
+		case TrustAnchorAssertion:
+			return verifyTrustAnchorAssertion(preverified, cert, chain);
+		case DomainIssuedCertificate:
+			return verifyDomainIssuedCertificate(preverified, cert, chain);
+		default:
+			throw std::runtime_error("Invalid certificate usage");
+	}
 }
 
 bool DANERecord::verify(const Certificate &cert) const
