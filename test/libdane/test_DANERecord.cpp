@@ -5,10 +5,6 @@
 
 using namespace libdane;
 
-constexpr DANERecord::VerifyResult Fail = DANERecord::Fail;
-constexpr DANERecord::VerifyResult Pass = DANERecord::Pass;
-constexpr DANERecord::VerifyResult PassAll = DANERecord::PassAll;
-
 SCENARIO("Lone certificates can be verified")
 {
 	Certificate cert = Certificate::parsePEM(resources::googlePEM).front();
@@ -58,20 +54,20 @@ SCENARIO("Certificates can be verified, callback-style")
 		
 		THEN("A correct chain should pass verification")
 		{
-			CHECK(rec.verify(true, chain[2], chain) == Pass);
-			CHECK(rec.verify(true, chain[1], chain) == Pass);
-			CHECK(rec.verify(true, chain[0], chain) == Pass);
+			CHECK(rec.verify(true, chain[2], chain));
+			CHECK(rec.verify(true, chain[1], chain));
+			CHECK(rec.verify(true, chain[0], chain));
 			
 			THEN("Preverification is ignored")
 			{
-				CHECK(rec.verify(false, chain[0], chain) == Pass);
+				CHECK(rec.verify(false, chain[0], chain));
 			}
 		}
 		
 		THEN("An invalid chain should fail at the last step")
 		{
-			CHECK(rec.verify(true, other[1], other) == Pass);
-			CHECK(rec.verify(true, other[0], other) == Fail);
+			CHECK(rec.verify(true, other[1], other));
+			CHECK_FALSE(rec.verify(true, other[0], other));
 		}
 	}
 	
@@ -81,23 +77,23 @@ SCENARIO("Certificates can be verified, callback-style")
 		
 		THEN("A correctly issued root certificate should pass verification")
 		{
-			CHECK(rec.verify(true, chain[2], chain) == Pass);
-			CHECK(rec.verify(true, chain[1], chain) == Pass);
-			CHECK(rec.verify(true, chain[0], chain) == Pass);
+			CHECK(rec.verify(true, chain[2], chain));
+			CHECK(rec.verify(true, chain[1], chain));
+			CHECK(rec.verify(true, chain[0], chain));
 			
 			THEN("Preverification is ignored")
 			{
-				CHECK(rec.verify(false, chain[2], chain) == Pass);
+				CHECK(rec.verify(false, chain[2], chain));
 			}
 		}
 		
 		THEN("A chain with a different root should fail verification")
 		{
-			CHECK(rec.verify(true, other[1], other) == Fail);
+			CHECK_FALSE(rec.verify(true, other[1], other));
 			
 			THEN("A valid continued chain should pass (should never happen)")
 			{
-				CHECK(rec.verify(true, other[0], other) == Pass);
+				CHECK(rec.verify(true, other[0], other));
 			}
 		}
 	}

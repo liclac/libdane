@@ -17,30 +17,6 @@ namespace libdane
 	{
 	public:
 		/**
-		 * Result of a verification operation.
-		 */
-		enum VerifyResult {
-			/**
-			 * Verification failed, abort.
-			 * No further verification should be done.
-			 */
-			Fail = 0,
-			
-			/**
-			 * Verification passed, proceed.
-			 * Verify the next certificate in the chain with another call.
-			 */
-			Pass = 1,
-			
-			/**
-			 * Verification passed, ignore remainder.
-			 * Sufficient verification has already been done, and examining
-			 * further certificates would be a waste of time, so don't do it.
-			 */
-			PassAll = 2,
-		};
-		
-		/**
 		 * Constructs a blank DANE Record.
 		 */
 		DANERecord();
@@ -71,7 +47,7 @@ namespace libdane
 		 * @param  chain       Full certificate chain
 		 * @return             A verification result
 		 */
-		VerifyResult verify(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
+		bool verify(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
 		
 		/**
 		 * Verifies the presented context against this record.
@@ -116,16 +92,16 @@ namespace libdane
 		
 	protected:
 		/// Implementation for verify() with DANERecord::CAConstraints
-		VerifyResult verifyCAConstraints(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
+		bool verifyCAConstraints(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
 		
 		/// Implementation for verify() with DANERecord::ServiceCertificateConstraint
-		VerifyResult verifyServiceCertificateConstraint(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
+		bool verifyServiceCertificateConstraint(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
 		
 		/// Implementation for verify() with DANERecord::TrustAnchorAssertion
-		VerifyResult verifyTrustAnchorAssertion(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
+		bool verifyTrustAnchorAssertion(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
 		
 		/// Implementation for verify() with DANERecord::DomainIssuedCertificate
-		VerifyResult verifyDomainIssuedCertificate(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
+		bool verifyDomainIssuedCertificate(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const;
 		
 	private:
 		Usage m_usage;

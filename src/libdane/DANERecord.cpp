@@ -28,7 +28,7 @@ DANERecord::~DANERecord()
 	
 }
 
-DANERecord::VerifyResult DANERecord::verify(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
+bool DANERecord::verify(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
 	switch (m_usage) {
 		case CAConstraints:
@@ -57,19 +57,7 @@ bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 	
 	Certificate cert = ctx.currentCert();
 	std::deque<Certificate> chain = ctx.chain();
-	VerifyResult result = verify(preverified, cert, chain);
-	
-	switch (result) {;
-		case Fail:
-			return false;
-		case Pass:
-			return true;
-		case PassAll:
-			ctx.setShouldPassAllChecks(true);
-			return true;
-		default:
-			throw std::runtime_error("Invalid verification result");
-	}
+	return verify(preverified, cert, chain);
 }
 
 bool DANERecord::verify(const Certificate &cert) const
@@ -145,48 +133,48 @@ void DANERecord::setData(Blob v) { m_data = v; }
 
 
 
-DANERecord::VerifyResult DANERecord::verifyCAConstraints(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
+bool DANERecord::verifyCAConstraints(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
 	// Reject untrusted certificates
 	if (!preverified) {
-		return Fail;
+		return false;
 	}
 	
 	return this->verifyTrustAnchorAssertion(preverified, cert, chain);
 }
 
-DANERecord::VerifyResult DANERecord::verifyServiceCertificateConstraint(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
+bool DANERecord::verifyServiceCertificateConstraint(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
 	// Reject untrusted certificates
 	if (!preverified) {
-		return Fail;
+		return false;
 	}
 	
 	return this->verifyDomainIssuedCertificate(preverified, cert, chain);
 }
 
-DANERecord::VerifyResult DANERecord::verifyTrustAnchorAssertion(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
+bool DANERecord::verifyTrustAnchorAssertion(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
 	auto it = std::find(chain.begin(), chain.end(), cert);
 	if (it == chain.end()) {
 		// The certificate isn't even in the chain, wtf
-		return Fail;
+		return false;
 	} else if (it != chain.end() - 1) {
 		// Verify that the current cert was in fact issued by the previous cert
 		const Certificate &prev = *(it + 1);
-		return cert.verify(prev) ? Pass : Fail;
+		return cert.verify(prev);
 	}
 	
 	// It's the root certificate; verify it against the record
-	return this->verify(cert) ? Pass : Fail;
+	return this->verify(cert);
 }
 
-DANERecord::VerifyResult DANERecord::verifyDomainIssuedCertificate(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
+bool DANERecord::verifyDomainIssuedCertificate(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
 	// Fast-forward to the final (front) certificate in the chain
 	if (cert != chain.front()) {
-		return Pass;
+		return true;
 	}
 	
-	return this->verify(cert) ? Pass : Fail;
+	return this->verify(cert);
 }
