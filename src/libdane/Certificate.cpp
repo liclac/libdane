@@ -108,6 +108,13 @@ Blob Certificate::select(Selector sel) const
 	}
 }
 
+bool Certificate::verify(const Certificate &other) const
+{
+	auto pkey = std::shared_ptr<EVP_PKEY>(X509_get_pubkey(other.x509()), EVP_PKEY_free);
+	int result = X509_verify(m_x509, &*pkey);
+	return result > 0;
+}
+
 
 
 std::string Certificate::nameStr(X509_NAME *name) const

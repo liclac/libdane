@@ -87,6 +87,14 @@ namespace libdane
 		Blob select(Selector sel) const;
 		
 		/**
+		 * Verifies that the certificate was issued by another one.
+		 * 
+		 * @param  other Another certificate
+		 * @return       true if other was used to issue this
+		 */
+		bool verify(const Certificate &other) const;
+		
+		/**
 		 * A certificate is truthy if it has an underlying representation.
 		 */
 		explicit operator bool() const { return m_x509 != nullptr; };

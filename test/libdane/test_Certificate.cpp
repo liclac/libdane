@@ -86,3 +86,30 @@ SCENARIO("Operators work")
 		}
 	}
 }
+
+SCENARIO("Certificate issuer status can be verified")
+{
+	GIVEN("Two certificate chains")
+	{
+		std::deque<Certificate> googleCerts = Certificate::parsePEM(resources::googlePEM);
+		std::deque<Certificate> microsoftCerts = Certificate::parsePEM(resources::microsoftPEM);
+		
+		THEN("A chain should pass verification")
+		{
+			CHECK(googleCerts[0].verify(googleCerts[1]));
+			CHECK(googleCerts[1].verify(googleCerts[2]));
+		}
+		
+		THEN("A chain should not pass backwards")
+		{
+			CHECK_FALSE(googleCerts[2].verify(googleCerts[1]));
+			CHECK_FALSE(googleCerts[1].verify(googleCerts[0]));
+		}
+		
+		THEN("Two unrelated certificates should not pass")
+		{
+			CHECK_FALSE(googleCerts[0].verify(microsoftCerts[0]));
+			CHECK_FALSE(microsoftCerts[0].verify(googleCerts[0]));
+		}
+	}
+}
