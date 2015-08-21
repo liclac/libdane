@@ -164,6 +164,8 @@ bool DANERecord::verifyServiceCertificateConstraint(bool preverified, const Cert
 
 bool DANERecord::verifyTrustAnchorAssertion(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
+	// Pass non-root certificates; it's already been verified to be issued by
+	// the previous one, which means we only need to care about the root cert
 	if (cert != chain.back()) {
 		return true;
 	}
@@ -179,5 +181,6 @@ bool DANERecord::verifyDomainIssuedCertificate(bool preverified, const Certifica
 		return true;
 	}
 	
+	// It's the domain certificate; verify it against the record
 	return this->verify(cert);
 }
