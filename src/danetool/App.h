@@ -1,8 +1,7 @@
 #ifndef DANETOOL_APP_H
 #define DANETOOL_APP_H
 
-#include <libdane/DANE.h>
-#include <libdane/DANERecord.h>
+#include <libdane/libdane.h>
 #include <asio.hpp>
 #include <asio/ssl.hpp>
 #include <memory>
