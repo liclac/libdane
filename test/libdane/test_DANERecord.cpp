@@ -8,21 +8,18 @@ using namespace libdane;
 SCENARIO("Lone certificates can be verified")
 {
 	Certificate cert = Certificate::parsePEM(resources::googlePEM).front();
-	DANERecord rec(DomainIssuedCertificate, FullCertificate, ExactMatch, cert.encoded());
 	
 	WHEN("Different selectors are used")
 	{
 		GIVEN("Full Certificate")
 		{
-			rec.setSelector(FullCertificate);
-			rec.setData(cert.encoded());
+			DANERecord rec(DomainIssuedCertificate, FullCertificate, ExactMatch, cert);
 			CHECK(rec.verify(cert));
 		}
 		
 		GIVEN("Public Key")
 		{
-			rec.setSelector(SubjectPublicKeyInfo);
-			rec.setData(cert.publicKey());
+			DANERecord rec(DomainIssuedCertificate, SubjectPublicKeyInfo, ExactMatch, cert);
 			CHECK(rec.verify(cert));
 		}
 	}
@@ -31,15 +28,13 @@ SCENARIO("Lone certificates can be verified")
 	{
 		GIVEN("SHA256Hash")
 		{
-			rec.setMatching(SHA256Hash);
-			rec.setData(rec.data().sha256());
+			DANERecord rec(DomainIssuedCertificate, FullCertificate, SHA256Hash, cert);
 			CHECK(rec.verify(cert));
 		}
 		
 		GIVEN("SHA512Hash")
 		{
-			rec.setMatching(SHA512Hash);
-			rec.setData(rec.data().sha512());
+			DANERecord rec(DomainIssuedCertificate, FullCertificate, SHA512Hash, cert);
 			CHECK(rec.verify(cert));
 		}
 	}
