@@ -51,10 +51,6 @@ bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 		return false;
 	}
 	
-	if (ctx.shouldPassAllChecks()) {
-		return preverified;
-	}
-	
 	Certificate cert = ctx.currentCert();
 	std::deque<Certificate> chain = ctx.chain();
 	return verify(preverified, cert, chain);
