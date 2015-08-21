@@ -19,6 +19,9 @@ DANERecord::DANERecord(Usage usage, Selector selector, MatchingType matching, Bl
 	
 }
 
+DANERecord::DANERecord(Usage usage, Selector selector, MatchingType matching, const Certificate &cert):
+	DANERecord(usage, selector, matching, cert.select(selector).match(matching)) {}
+
 DANERecord::~DANERecord()
 {
 	

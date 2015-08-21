@@ -51,6 +51,14 @@ namespace libdane
 		DANERecord(Usage usage, Selector selector, MatchingType matching, Blob data);
 		
 		/**
+		 * Constructs a DANE record matching the given certificate.
+		 * 
+		 * This is mainly useful for testing. It will simply copy its data from
+		 * the given certificate, using the selector and matching given.
+		 */
+		DANERecord(Usage usage, Selector selector, MatchingType matching, const Certificate &cert);
+		
+		/**
 		 * Destructor.
 		 */
 		virtual ~DANERecord();
