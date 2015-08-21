@@ -53,6 +53,19 @@ bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
 	
 	Certificate cert = ctx.currentCert();
 	std::deque<Certificate> chain = ctx.chain();
+	
+	auto it = std::find(chain.begin(), chain.end(), cert);
+	if (it == chain.end()) {
+		// The certificate isn't even in the chain, wtf
+		return false;
+	} else if (it != chain.end() - 1) {
+		// Verify that the current cert was in fact issued by the previous cert
+		const Certificate &prev = *(it + 1);
+		if (!cert.verify(prev)) {
+			return false;
+		}
+	}
+	
 	return verify(preverified, cert, chain);
 }
 
@@ -151,14 +164,8 @@ bool DANERecord::verifyServiceCertificateConstraint(bool preverified, const Cert
 
 bool DANERecord::verifyTrustAnchorAssertion(bool preverified, const Certificate &cert, const std::deque<Certificate> &chain) const
 {
-	auto it = std::find(chain.begin(), chain.end(), cert);
-	if (it == chain.end()) {
-		// The certificate isn't even in the chain, wtf
-		return false;
-	} else if (it != chain.end() - 1) {
-		// Verify that the current cert was in fact issued by the previous cert
-		const Certificate &prev = *(it + 1);
-		return cert.verify(prev);
+	if (cert != chain.back()) {
+		return true;
 	}
 	
 	// It's the root certificate; verify it against the record
