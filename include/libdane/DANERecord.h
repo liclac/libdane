@@ -46,10 +46,10 @@ namespace libdane
 		 * certificates in an OpenSSL callback.
 		 * 
 		 * @param  preverified Is the certificate trusted by the system?
-		 * @param  vc          The active verification context
+		 * @param  ctx         The active verification context
 		 * @return             Whether the verification passed or not
 		 */
-		bool verify(bool preverified, asio::ssl::verify_context &vc) const;
+		bool verify(bool preverified, const VerifyContext &ctx) const;
 		
 		/**
 		 * Verifies the presented certificate and chain against this record.

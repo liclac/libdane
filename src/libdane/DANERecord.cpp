@@ -28,9 +28,8 @@ DANERecord::~DANERecord()
 	
 }
 
-bool DANERecord::verify(bool preverified, asio::ssl::verify_context &vc) const
+bool DANERecord::verify(bool preverified, const VerifyContext &ctx) const
 {
-	VerifyContext ctx(vc);
 	if (!ctx.currentCert()) {
 		return false;
 	}
