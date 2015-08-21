@@ -1,5 +1,6 @@
 #include <libdane/DANE.h>
 #include <libdane/DANERecord.h>
+#include <libdane/Util.h>
 #include <iostream>
 #include <sstream>
 #include <memory>
@@ -37,13 +38,8 @@ asio::ssl::context DANE::sslContextFrom(std::deque<DANERecord> records)
 {
 	asio::ssl::context ssl_ctx(asio::ssl::context::sslv23);
 	ssl_ctx.set_verify_mode(asio::ssl::verify_peer);
-	ssl_ctx.set_verify_callback([=](bool preverified, asio::ssl::verify_context &vc) {
-		for (const DANERecord &record : records) {
-			if (record.verify(preverified, vc)) {
-				return true;
-			}
-		}
-		return false;
+	ssl_ctx.set_verify_callback([=](bool preverified, asio::ssl::verify_context &ctx) {
+		return verify(preverified, ctx, records.begin(), records.end());
 	});
 	
 	return ssl_ctx;
