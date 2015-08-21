@@ -105,13 +105,12 @@ namespace libdane
 		
 	private:
 		std::vector<unsigned char> m_data;
-		
-	public:
-		/**
-		 * Allow writing of Blobs to streams.
-		 */
-		friend std::ostream& operator<<(std::ostream& stream, const Blob &blob);
 	};
+	
+	/**
+	 * Allow writing of Blobs to streams.
+	 */
+	std::ostream& operator<<(std::ostream& stream, const Blob &blob);
 }
 
 #endif
