@@ -1,4 +1,4 @@
-#include <libdane/DANE.h>
+#include <libdane/net/Resolver.h>
 #include <libdane/DANERecord.h>
 #include <libdane/Util.h>
 #include <iostream>
@@ -12,29 +12,30 @@ extern "C" {
 }
 
 using namespace libdane;
+using namespace libdane::net;
 
 /// @private
-struct DANE::Impl
+struct Resolver::Impl
 {
 	ldns_resolver *resolver = NULL;
 };
 
-DANE::DANE(asio::io_service &service):
+Resolver::Resolver(asio::io_service &service):
 	service(service),
-	p(new DANE::Impl)
+	p(new Resolver::Impl)
 {
 	if (ldns_resolver_new_frm_file(&p->resolver, NULL) != LDNS_STATUS_OK) {
 		throw std::runtime_error("Cannot create a resolver from /etc/resolv.conf");
 	}
 }
 
-DANE::~DANE()
+Resolver::~Resolver()
 {
 	ldns_resolver_deep_free(p->resolver);
 	delete p;
 }
 
-asio::ssl::context DANE::sslContextFrom(std::deque<DANERecord> records)
+asio::ssl::context Resolver::sslContextFrom(std::deque<DANERecord> records)
 {
 	asio::ssl::context ssl_ctx(asio::ssl::context::sslv23);
 	ssl_ctx.set_verify_mode(asio::ssl::verify_peer);
@@ -45,7 +46,7 @@ asio::ssl::context DANE::sslContextFrom(std::deque<DANERecord> records)
 	return ssl_ctx;
 }
 
-void DANE::lookupDANE(const std::string &domain, unsigned short port, Protocol proto, std::function<void(std::deque<DANERecord>)> callback)
+void Resolver::lookupDANE(const std::string &domain, unsigned short port, Protocol proto, std::function<void(std::deque<DANERecord>)> callback)
 {
 	// Build a _<port>._<proto>.<domain> string for service lookup
 	std::stringstream record_path_ss;

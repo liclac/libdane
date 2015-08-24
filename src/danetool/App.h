@@ -2,6 +2,7 @@
 #define DANETOOL_APP_H
 
 #include <libdane/libdane.h>
+#include <libdane/net/net.h>
 #include <asio.hpp>
 #include <asio/ssl.hpp>
 #include <memory>
@@ -64,8 +65,8 @@ protected:
 	
 	
 	asio::io_service service;			///< ASIO Service
-	asio::ip::tcp::resolver resolver;	///< DNS Resolver
-	libdane::DANE dane;					///< DANE manager object
+	asio::ip::tcp::resolver dnsres;		///< DNS Resolver
+	libdane::net::Resolver daneres;		///< DANE resolver object
 	
 	std::string progname;		///< Program name, as called
 	struct {

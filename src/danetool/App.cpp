@@ -3,11 +3,12 @@
 #include <sstream>
 
 using namespace libdane;
+using namespace libdane::net;
 using namespace asio;
 using namespace std::placeholders;
 
 App::App():
-	resolver(service), dane(service)
+	dnsres(service), daneres(service)
 {
 	
 }
@@ -25,7 +26,7 @@ int App::run(const std::vector<std::string> &args_)
 	}
 	
 	// Look up the DANE record for the mail server on the domain
-	dane.lookupDANE(args.domain, 25, DANE::TCP, [&](std::deque<DANERecord> records) {
+	daneres.lookupDANE(args.domain, 25, Resolver::TCP, [&](std::deque<DANERecord> records) {
 		for (auto it = records.begin(); it != records.end(); ++it) {
 			std::cout << it->toString() << std::endl;
 		}
@@ -42,7 +43,7 @@ int App::run(const std::vector<std::string> &args_)
 void App::connectSMTP(const std::string &domain, unsigned short port, std::deque<libdane::DANERecord> records)
 {
 	ip::tcp::resolver::query q(args.domain, std::to_string(port));
-	resolver.async_resolve(q, [this, records](const error_code& err, ip::tcp::resolver::iterator it) {
+	dnsres.async_resolve(q, [this, records](const error_code& err, ip::tcp::resolver::iterator it) {
 		if (err) {
 			std::cerr << "Couldn't resolve domain: " << err.message() << std::endl;
 			return;
@@ -118,7 +119,7 @@ void App::connectSMTP(const std::string &domain, unsigned short port, std::deque
 
 void App::handshake(std::shared_ptr<asio::ip::tcp::socket> plain_sock, std::deque<libdane::DANERecord> records)
 {
-	auto ctx = std::make_shared<ssl::context>(DANE::sslContextFrom(records));
+	auto ctx = std::make_shared<ssl::context>(Resolver::sslContextFrom(records));
 	auto sock = std::make_shared<ssl::stream<ip::tcp::socket&>>(*plain_sock, *ctx);
 	sock->async_handshake(ssl::stream<ip::tcp::socket>::client, [=](const error_code &err) {
 		if (err) {
