@@ -119,7 +119,12 @@ void App::connectSMTP(const std::string &domain, unsigned short port, std::deque
 
 void App::handshake(std::shared_ptr<asio::ip::tcp::socket> plain_sock, std::deque<libdane::DANERecord> records)
 {
-	auto ctx = std::make_shared<ssl::context>(Resolver::sslContextFrom(records));
+	auto ctx = std::make_shared<ssl::context>(asio::ssl::context::sslv23);
+	ctx->set_verify_mode(asio::ssl::verify_peer);
+	ctx->set_verify_callback([=](bool preverified, asio::ssl::verify_context &ctx) {
+		return verify(preverified, ctx, records.begin(), records.end());
+	});
+	
 	auto sock = std::make_shared<ssl::stream<ip::tcp::socket&>>(*plain_sock, *ctx);
 	sock->async_handshake(ssl::stream<ip::tcp::socket>::client, [=](const error_code &err) {
 		if (err) {

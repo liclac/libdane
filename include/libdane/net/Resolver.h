@@ -46,16 +46,6 @@ namespace libdane
 			
 			
 			/**
-			 * Creates an SSL context from a list of records.
-			 * 
-			 * @param  records Records to verify against
-			 * @return         A preconfigured SSL context
-			 */
-			static asio::ssl::context sslContextFrom(std::deque<libdane::DANERecord> records);
-			
-			
-			
-			/**
 			 * Look up the DANE record for the given domain.
 			 * 
 			 * @param domain   Domain name to look up
@@ -77,6 +67,5 @@ namespace libdane
 		};
 	}
 }
-
 
 #endif
