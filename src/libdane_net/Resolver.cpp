@@ -29,13 +29,13 @@ Resolver::~Resolver()
 	delete p;
 }
 
-void Resolver::lookupDANE(const std::string &domain, unsigned short port, Protocol proto, std::function<void(std::deque<DANERecord>)> callback)
+void Resolver::lookupDANE(const std::string &domain, unsigned short port, libdane::net::Protocol proto, std::function<void(std::deque<DANERecord>)> callback)
 {
 	std::string record_name = resource_record_name(domain, port, proto);
 	this->lookupDANE(record_name, callback);
 }
 
-void Resolver::lookupDANE(const std::string &record_name, std::function<void(std::deque<libdane::DANERecord>)> callback)
+void Resolver::lookupDANE(const std::string &record_name, std::function<void(std::deque<DANERecord>)> callback)
 {
 	// For now, just post a synchronous DNS lookup to a worker thread
 	// TODO: Use ASIO's network facilities for proper asynchrony

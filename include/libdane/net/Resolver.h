@@ -50,7 +50,7 @@ namespace libdane
 			 * @param proto    Protocol to look up a service for
 			 * @param callback Callback, receiving a DANERecord list
 			 */
-			void lookupDANE(const std::string &domain, unsigned short port, Protocol proto, std::function<void(std::deque<libdane::DANERecord>)> callback);
+			void lookupDANE(const std::string &domain, unsigned short port, libdane::net::Protocol proto, std::function<void(std::deque<DANERecord>)> callback);
 			
 			/**
 			 * Look up the DANE record for the given resource.
@@ -58,7 +58,7 @@ namespace libdane
 			 * @param record_name A record name, in the format _port._proto.domain
 			 * @param callback    Callback, receiving a DANERecord list
 			 */
-			void lookupDANE(const std::string &record_name, std::function<void(std::deque<libdane::DANERecord>)> callback);
+			void lookupDANE(const std::string &record_name, std::function<void(std::deque<DANERecord>)> callback);
 			
 		protected:
 			/**
