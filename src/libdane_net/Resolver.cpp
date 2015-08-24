@@ -2,8 +2,6 @@
 #include <libdane/DANERecord.h>
 #include <libdane/Util.h>
 #include <libdane/net/Util.h>
-#include <iostream>
-#include <sstream>
 #include <memory>
 #include <vector>
 
@@ -33,26 +31,18 @@ Resolver::~Resolver()
 
 void Resolver::lookupDANE(const std::string &domain, unsigned short port, Protocol proto, std::function<void(std::deque<DANERecord>)> callback)
 {
-	// Build a _<port>._<proto>.<domain> string for service lookup
-	std::stringstream record_path_ss;
-	record_path_ss << "_" << port << "._";
-	switch (proto) {
-		case TCP:
-			record_path_ss << "tcp";
-			break;
-		case UDP:
-			record_path_ss << "udp";
-			break;
-	}
-	record_path_ss << "." << domain;
-	std::string record_path = record_path_ss.str();
-	
+	std::string record_name = resource_record_name(domain, port, proto);
+	this->lookupDANE(record_name, callback);
+}
+
+void Resolver::lookupDANE(const std::string &record_name, std::function<void(std::deque<libdane::DANERecord>)> callback)
+{
 	// For now, just post a synchronous DNS lookup to a worker thread
 	// TODO: Use ASIO's network facilities for proper asynchrony
 	service.post([=] {
-		std::shared_ptr<ldns_rdf> ldomain(ldns_dname_new_frm_str(record_path.c_str()), ldns_rdf_deep_free);
+		std::shared_ptr<ldns_rdf> ldomain(ldns_dname_new_frm_str(record_name.c_str()), ldns_rdf_deep_free);
 		if (!ldomain) {
-			throw std::runtime_error(std::string("Invalid record path: ") + record_path);
+			throw std::runtime_error(std::string("Invalid record path: ") + record_name);
 		}
 		
 		std::shared_ptr<ldns_pkt> pkt(ldns_resolver_query(

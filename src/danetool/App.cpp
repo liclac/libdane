@@ -26,7 +26,7 @@ int App::run(const std::vector<std::string> &args_)
 	}
 	
 	// Look up the DANE record for the mail server on the domain
-	daneres.lookupDANE(args.domain, 25, Resolver::TCP, [&](std::deque<DANERecord> records) {
+	daneres.lookupDANE(args.domain, 25, TCP, [&](std::deque<DANERecord> records) {
 		for (auto it = records.begin(); it != records.end(); ++it) {
 			std::cout << it->toString() << std::endl;
 		}

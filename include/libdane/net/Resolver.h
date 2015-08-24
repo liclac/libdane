@@ -1,6 +1,7 @@
 #ifndef LIBDANE_NET_RESOLVER_H
 #define LIBDANE_NET_RESOLVER_H
 
+#include "common.h"
 #include <asio.hpp>
 #include <asio/ssl.hpp>
 #include <deque>
@@ -24,16 +25,6 @@ namespace libdane
 		{
 		public:
 			/**
-			 * Enum for protocols in lookups.
-			 */
-			enum Protocol {
-				TCP,			///< Transmission Control Protocol
-				UDP,			///< User Datagram Protocol
-			};
-			
-			
-			
-			/**
 			 * Constructs a DANE Resolver running on the given ASIO Service.
 			 */
 			Resolver(asio::io_service &service);
@@ -48,12 +39,26 @@ namespace libdane
 			/**
 			 * Look up the DANE record for the given domain.
 			 * 
+			 * This is equivalent to calling:
+			 * 
+			 *     lookupDANE(resource_record_name(domain, port, proto), callback);
+			 * 
+			 * @see libdane::net::resource_record_name()
+			 * 
 			 * @param domain   Domain name to look up
 			 * @param port     Port to look up a service for
 			 * @param proto    Protocol to look up a service for
 			 * @param callback Callback, receiving a DANERecord list
 			 */
 			void lookupDANE(const std::string &domain, unsigned short port, Protocol proto, std::function<void(std::deque<libdane::DANERecord>)> callback);
+			
+			/**
+			 * Look up the DANE record for the given resource.
+			 * 
+			 * @param record_name A record name, in the format _port._proto.domain
+			 * @param callback    Callback, receiving a DANERecord list
+			 */
+			void lookupDANE(const std::string &record_name, std::function<void(std::deque<libdane::DANERecord>)> callback);
 			
 		protected:
 			/**
