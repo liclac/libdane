@@ -24,13 +24,13 @@ Resolver::~Resolver()
 	
 }
 
-void Resolver::lookupDANE(const std::string &domain, unsigned short port, libdane::net::Protocol proto, std::function<void(std::deque<DANERecord>)> callback)
+void Resolver::lookupDANE(const std::string &domain, unsigned short port, libdane::net::Protocol proto, LookupCallback cb)
 {
 	std::string record_name = resource_record_name(domain, port, proto);
-	this->lookupDANE(record_name, callback);
+	this->lookupDANE(record_name, cb);
 }
 
-void Resolver::lookupDANE(const std::string &record_name, std::function<void(std::deque<DANERecord>)> cb)
+void Resolver::lookupDANE(const std::string &record_name, LookupCallback cb)
 {
 	std::shared_ptr<ldns_pkt> pkt(ldns_pkt_query_new(
 		ldns_dname_new_frm_str(record_name.c_str()),
@@ -57,17 +57,20 @@ void Resolver::lookupDANE(const std::string &record_name, std::function<void(std
 	auto sock = std::make_shared<asio::ip::tcp::socket>(service);
 	async_connect(*sock, endpoints.begin(), endpoints.end(), [this, sock, cb, qbuf](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::iterator it) {
 		if (err) {
+			cb(err, {});
 			return;
 		}
 		
 		sock->async_send(asio::buffer(*qbuf), [this, sock, cb, qbuf](const asio::error_code &err, std::size_t size) {
 			if (err) {
+				cb(err, {});
 				return;
 			}
 			
 			auto rdbuf = std::make_shared<std::vector<unsigned char>>(sizeof(uint16_t));
 			sock->async_receive(asio::buffer(*rdbuf), [this, sock, cb, rdbuf](const asio::error_code &err, std::size_t size) {
 				if (err) {
+					cb(err, {});
 					return;
 				}
 				
@@ -83,6 +86,7 @@ void Resolver::lookupDANE(const std::string &record_name, std::function<void(std
 				
 				sock->async_receive(asio::buffer(*rdbuf), [this, sock, cb, rdbuf, len](const asio::error_code &err, std::size_t size) {
 					if (err) {
+						cb(err, {});
 						return;
 					}
 					
@@ -96,7 +100,7 @@ void Resolver::lookupDANE(const std::string &record_name, std::function<void(std
 					}
 					std::shared_ptr<ldns_pkt> packet(packet_ptr, ldns_pkt_free);
 					std::deque<DANERecord> records = this->decode(packet);
-					cb(records);
+					cb(err, records);
 				});
 			});
 		});
