@@ -1,10 +1,12 @@
 #ifndef LIBDANE_NET_RESOLVER_H
 #define LIBDANE_NET_RESOLVER_H
 
+#include "_internal/include_ldns.h"
 #include "common.h"
 #include <asio.hpp>
 #include <asio/ssl.hpp>
 #include <deque>
+#include <memory>
 
 namespace libdane
 {
@@ -60,15 +62,21 @@ namespace libdane
 			 */
 			void lookupDANE(const std::string &record_name, std::function<void(std::deque<DANERecord>)> callback);
 			
+			/**
+			 * Decodes a packet into a list of records.
+			 */
+			std::deque<DANERecord> decode(std::shared_ptr<ldns_pkt> pkt);
+			
 		protected:
 			/**
 			 * ASIO Service to run asynchronous operations on.
 			 */
 			asio::io_service &service;
 			
-		private:
-			struct Impl;
-			Impl *p;
+			/**
+			 * A list of possible endpoints to connect to.
+			 */
+			std::vector<asio::ip::tcp::endpoint> endpoints;
 		};
 	}
 }
