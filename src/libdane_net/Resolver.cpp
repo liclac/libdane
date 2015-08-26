@@ -24,18 +24,10 @@ Resolver::~Resolver()
 	
 }
 
-void Resolver::lookupDANE(const std::string &domain, unsigned short port, libdane::net::Protocol proto, LookupCallback cb)
+void Resolver::query(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class, uint16_t flags, QueryCallback cb)
 {
-	std::string record_name = resource_record_name(domain, port, proto);
-	this->lookupDANE(record_name, cb);
-}
-
-void Resolver::lookupDANE(const std::string &record_name, LookupCallback cb)
-{
-	std::shared_ptr<ldns_pkt> pkt(ldns_pkt_query_new(
-		ldns_dname_new_frm_str(record_name.c_str()),
-		LDNS_RR_TYPE_TLSA, LDNS_RR_CLASS_IN, LDNS_RD),
-	ldns_pkt_free);
+	ldns_rdf *dname = ldns_dname_new_frm_str(domain.c_str());
+	std::shared_ptr<ldns_pkt> pkt(ldns_pkt_query_new(dname, rr_type, rr_class, flags), ldns_pkt_free);
 	if (!pkt) {
 		throw std::runtime_error("Couldn't create a query packet");
 	}
@@ -98,16 +90,38 @@ void Resolver::lookupDANE(const std::string &record_name, LookupCallback cb)
 					if (ldns_wire2pkt(&packet_ptr, rdbuf->data(), rdbuf->size()) != LDNS_STATUS_OK) {
 						throw std::runtime_error("Failed to decode response");
 					}
-					std::shared_ptr<ldns_pkt> packet(packet_ptr, ldns_pkt_free);
-					std::deque<DANERecord> records = this->decode(packet);
-					cb(err, records);
+					std::shared_ptr<ldns_pkt> pkt(packet_ptr, ldns_pkt_free);
+					cb({}, pkt);
 				});
 			});
 		});
 	});
 }
 
-std::deque<DANERecord> Resolver::decode(std::shared_ptr<ldns_pkt> pkt)
+void Resolver::query(const std::string &domain, ldns_rr_type rr_type, QueryCallback cb)
+{
+	this->query(domain, rr_type, LDNS_RR_CLASS_IN, LDNS_RD, cb);
+}
+
+void Resolver::lookupDANE(const std::string &domain, unsigned short port, libdane::net::Protocol proto, LookupCallback cb)
+{
+	std::string record_name = resource_record_name(domain, port, proto);
+	this->lookupDANE(record_name, cb);
+}
+
+void Resolver::lookupDANE(const std::string &record_name, LookupCallback cb)
+{
+	this->query(record_name, LDNS_RR_TYPE_TLSA, [=](const asio::error_code &err, std::shared_ptr<ldns_pkt> pkt) {
+		if (err) {
+			cb(err, {});
+			return;
+		}
+		
+		cb({}, this->decodeTLSA(pkt));
+	});
+}
+
+std::deque<DANERecord> Resolver::decodeTLSA(std::shared_ptr<ldns_pkt> pkt)
 {
 	std::deque<DANERecord> records;
 	

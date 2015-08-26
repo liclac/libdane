@@ -27,7 +27,12 @@ namespace libdane
 		{
 		public:
 			/**
-			 * Callback type for lookup functions.
+			 * Callback type for query functions.
+			 */
+			typedef std::function<void(const asio::error_code &err, std::shared_ptr<ldns_pkt> pkt)> QueryCallback;
+			
+			/**
+			 * Callback type for DANE lookup functions.
 			 */
 			typedef std::function<void(const asio::error_code &err, std::deque<DANERecord>)> LookupCallback;
 			
@@ -44,6 +49,29 @@ namespace libdane
 			virtual ~Resolver();
 			
 			
+			/**
+			 * Sends an arbitrary DNS query.
+			 * 
+			 * @param domain   Domain to query
+			 * @param rr_type  Record type to query for (eg. LDNS_RR_TYPE_A)
+			 * @param rr_class Record class to query for (eg. LDNS_RR_CLASS_IN)
+			 * @param flags    Query flags (eg. LDNS_RD)
+			 * @param callback Callback for the results
+			 */
+			void query(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class, uint16_t flags, QueryCallback callback);
+			
+			/**
+			 * Sends an arbitrary DNS query with a default class and flag.
+			 * 
+			 * Since you basically only ever need to query IN-class records
+			 * with the RD (Recursion Desired) flag, this is a shortcut to
+			 * doing so.
+			 * 
+			 * @param domain   Domain to query
+			 * @param rr_type  Record type to query for (eg. LDNS_RR_TYPE_A)
+			 * @param callback Callback for the results
+			 */
+			void query(const std::string &domain, ldns_rr_type rr_type, QueryCallback callback);
 			
 			/**
 			 * Look up the DANE record for the given domain.
@@ -72,7 +100,7 @@ namespace libdane
 			/**
 			 * Decodes a packet into a list of records.
 			 */
-			std::deque<DANERecord> decode(std::shared_ptr<ldns_pkt> pkt);
+			std::deque<DANERecord> decodeTLSA(std::shared_ptr<ldns_pkt> pkt);
 			
 		protected:
 			/**
