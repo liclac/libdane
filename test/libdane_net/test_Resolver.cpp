@@ -1,5 +1,7 @@
 #include <catch.hpp>
 #include <libdane/net/Resolver.h>
+#include <libdane/Blob.h>
+#include <algorithm>
 
 using namespace libdane;
 using namespace libdane::net;
@@ -40,6 +42,47 @@ SCENARIO("Query construction works")
 			CHECK(ldns_rr_is_question(rr));
 			CHECK(ldns_rr_get_type(rr) == LDNS_RR_TYPE_A);
 			CHECK(ldns_rr_get_class(rr) == LDNS_RR_CLASS_IN);	// This is a default
+		}
+	}
+}
+
+SCENARIO("Wire encoding works")
+{
+	asio::io_service service;
+	Resolver res(service);
+	
+	GIVEN("A valid packet")
+	{
+		auto pkt = res.makeQuery("google.com", LDNS_RR_TYPE_A);
+		
+		WHEN("Encoded for UDP")
+		{
+			std::vector<unsigned char> udp = res.wire(pkt, false);
+			
+			THEN("The checksum should be correct")
+			{
+				REQUIRE(Blob(udp).sha256().hex() == "cc43d1338bffcc384219754b99618efa4cec609b32776d6d0b8c9fdf9aa69001");
+			}
+			
+			THEN("Encoded for TCP")
+			{
+				std::vector<unsigned char> tcp = res.wire(pkt, true);
+				
+				THEN("It should just add a prefix")
+				{
+					REQUIRE(tcp.size() == udp.size() + 2);
+					REQUIRE(std::equal(udp.begin(), udp.end(), tcp.begin() + 2));
+				}
+				
+				THEN("The length prefix should be correct")
+				{
+					uint16_t len;
+					std::copy(tcp.begin(), tcp.begin() + 2, reinterpret_cast<unsigned char*>(&len));
+					len = ntohs(len);
+					
+					REQUIRE(len == udp.size());
+				}
+			}
 		}
 	}
 }
