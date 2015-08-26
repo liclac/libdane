@@ -51,6 +51,23 @@ namespace libdane
 			
 			
 			/**
+			 * Returns a reference to the ASIO service.
+			 */
+			asio::io_service &service() const;
+			
+			/**
+			 * Returns a reference to the list of nameserver endpoints.
+			 */
+			const std::vector<asio::ip::tcp::endpoint>& endpoints() const;
+			
+			/**
+			 * Sets the list of nameserver endpoints.
+			 */
+			void setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v);
+			
+			
+			
+			/**
 			 * Sends an arbitrary DNS query.
 			 * 
 			 * @param domain   Domain to query
@@ -129,12 +146,12 @@ namespace libdane
 			/**
 			 * ASIO Service to run asynchronous operations on.
 			 */
-			asio::io_service &service;
+			asio::io_service &m_service;
 			
 			/**
 			 * A list of possible endpoints to connect to.
 			 */
-			std::vector<asio::ip::tcp::endpoint> endpoints;
+			std::vector<asio::ip::tcp::endpoint> m_endpoints;
 		};
 	}
 }

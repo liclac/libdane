@@ -9,14 +9,14 @@ using namespace libdane;
 using namespace libdane::net;
 
 Resolver::Resolver(asio::io_service &service):
-	service(service)
+	m_service(service)
 {
 	// Hardcoding Google's DNS servers for now
 	// TODO: Parse /etc/resolv.conf instead
-	endpoints.emplace_back(asio::ip::address::from_string("2001:4860:4860::8888"), 53);
-	endpoints.emplace_back(asio::ip::address::from_string("2001:4860:4860::8844"), 53);
-	endpoints.emplace_back(asio::ip::address::from_string("8.8.8.8"), 53);
-	endpoints.emplace_back(asio::ip::address::from_string("8.8.4.4"), 53);
+	m_endpoints.emplace_back(asio::ip::address::from_string("2001:4860:4860::8888"), 53);
+	m_endpoints.emplace_back(asio::ip::address::from_string("2001:4860:4860::8844"), 53);
+	m_endpoints.emplace_back(asio::ip::address::from_string("8.8.8.8"), 53);
+	m_endpoints.emplace_back(asio::ip::address::from_string("8.8.4.4"), 53);
 }
 
 Resolver::~Resolver()
@@ -24,13 +24,22 @@ Resolver::~Resolver()
 	
 }
 
+
+
+asio::io_service& Resolver::service() const { return m_service; }
+
+const std::vector<asio::ip::tcp::endpoint>& Resolver::endpoints() const { return m_endpoints; }
+void Resolver::setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v) { m_endpoints = v; }
+
+
+
 void Resolver::query(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class, uint16_t flags, QueryCallback cb)
 {
 	auto pkt = this->makeQuery(domain, rr_type, rr_class, flags);
 	auto qbuf = std::make_shared<std::vector<unsigned char>>(this->wire(pkt));
 	
-	auto sock = std::make_shared<asio::ip::tcp::socket>(service);
-	async_connect(*sock, endpoints.begin(), endpoints.end(), [this, sock, cb, qbuf](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::iterator it) {
+	auto sock = std::make_shared<asio::ip::tcp::socket>(m_service);
+	async_connect(*sock, m_endpoints.begin(), m_endpoints.end(), [this, sock, cb, qbuf](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::iterator it) {
 		if (err) {
 			cb(err, {});
 			return;
