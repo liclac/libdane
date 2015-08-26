@@ -26,13 +26,7 @@ Resolver::~Resolver()
 
 void Resolver::query(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class, uint16_t flags, QueryCallback cb)
 {
-	ldns_rdf *dname = ldns_dname_new_frm_str(domain.c_str());
-	std::shared_ptr<ldns_pkt> pkt(ldns_pkt_query_new(dname, rr_type, rr_class, flags), ldns_pkt_free);
-	if (!pkt) {
-		throw std::runtime_error("Couldn't create a query packet");
-	}
-	ldns_pkt_set_id(&*pkt, 1337);
-	
+	auto pkt = this->makeQuery(domain, rr_type, rr_class, flags);
 	auto qbuf = std::make_shared<std::vector<unsigned char>>(this->wire(pkt));
 	
 	auto sock = std::make_shared<asio::ip::tcp::socket>(service);
@@ -121,6 +115,18 @@ std::deque<DANERecord> Resolver::decodeTLSA(std::shared_ptr<ldns_pkt> pkt)
 	}
 	
 	return records;
+}
+
+std::shared_ptr<ldns_pkt> Resolver::makeQuery(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class, uint16_t flags)
+{
+	ldns_rdf *dname = ldns_dname_new_frm_str(domain.c_str());
+	std::shared_ptr<ldns_pkt> pkt(ldns_pkt_query_new(dname, rr_type, rr_class, flags), ldns_pkt_free);
+	if (!pkt) {
+		throw std::runtime_error("Couldn't create a query packet");
+	}
+	ldns_pkt_set_id(&*pkt, 1337);
+	
+	return pkt;
 }
 
 std::vector<unsigned char> Resolver::wire(std::shared_ptr<ldns_pkt> pkt, bool tcp)

@@ -102,7 +102,16 @@ namespace libdane
 			 */
 			std::deque<DANERecord> decodeTLSA(std::shared_ptr<ldns_pkt> pkt);
 			
-			
+			/**
+			 * Constructs a query packet.
+			 * 
+			 * @param  domain Domain to query
+			 * @param  rr_type  Record type to query for (eg. LDNS_RR_TYPE_A)
+			 * @param  rr_class Record class to query for (eg. LDNS_RR_CLASS_IN)
+			 * @param  flags    Query flags (eg. LDNS_RD)
+			 * @return A DNS packet structure
+			 */
+			std::shared_ptr<ldns_pkt> makeQuery(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class = LDNS_RR_CLASS_IN, uint16_t flags = LDNS_RD);
 			
 			/**
 			 * Formats a DNS packet to wire format.
