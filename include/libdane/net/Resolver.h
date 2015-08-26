@@ -102,6 +102,17 @@ namespace libdane
 			 */
 			std::deque<DANERecord> decodeTLSA(std::shared_ptr<ldns_pkt> pkt);
 			
+			
+			
+			/**
+			 * Formats a DNS packet to wire format.
+			 * 
+			 * @param  pkt A DNS packet to format
+			 * @param  tcp Format for TCP (with a length prefix)
+			 * @return The packet in binary wire format
+			 */
+			std::vector<unsigned char> wire(std::shared_ptr<ldns_pkt> pkt, bool tcp = true);
+			
 		protected:
 			/**
 			 * ASIO Service to run asynchronous operations on.

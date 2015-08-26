@@ -33,18 +33,7 @@ void Resolver::query(const std::string &domain, ldns_rr_type rr_type, ldns_rr_cl
 	}
 	ldns_pkt_set_id(&*pkt, 1337);
 	
-	uint8_t *buf;
-	std::size_t len;
-	if (ldns_pkt2wire(&buf, &*pkt, &len) != LDNS_STATUS_OK) {
-		throw std::runtime_error("Couldn't convert packet to wire format");
-	}
-	uint16_t binlen = htons(len);
-	
-	auto qbuf = std::make_shared<std::vector<unsigned char>>();
-	qbuf->insert(qbuf->begin(), &binlen, &binlen + sizeof(binlen));
-	qbuf->insert(qbuf->begin() + sizeof(binlen), buf, buf + len);
-	
-	free(buf);
+	auto qbuf = std::make_shared<std::vector<unsigned char>>(this->wire(pkt));
 	
 	auto sock = std::make_shared<asio::ip::tcp::socket>(service);
 	async_connect(*sock, endpoints.begin(), endpoints.end(), [this, sock, cb, qbuf](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::iterator it) {
@@ -132,4 +121,23 @@ std::deque<DANERecord> Resolver::decodeTLSA(std::shared_ptr<ldns_pkt> pkt)
 	}
 	
 	return records;
+}
+
+std::vector<unsigned char> Resolver::wire(std::shared_ptr<ldns_pkt> pkt, bool tcp)
+{
+	uint8_t *buf;
+	std::size_t len;
+	if (ldns_pkt2wire(&buf, &*pkt, &len) != LDNS_STATUS_OK) {
+		throw std::runtime_error("Couldn't convert packet to wire format");
+	}
+	
+	auto qbuf_ = std::vector<unsigned char>();
+	if (tcp) {
+		uint16_t binlen = htons(len);
+		unsigned char *binlen_ptr = reinterpret_cast<unsigned char*>(&binlen);
+		qbuf_.insert(qbuf_.end(), binlen_ptr, binlen_ptr + sizeof(binlen));
+	}
+	qbuf_.insert(qbuf_.end(), buf, buf + len);
+	
+	return qbuf_;
 }
