@@ -49,6 +49,7 @@ namespace libdane
 			virtual ~Resolver();
 			
 			
+			
 			/**
 			 * Sends an arbitrary DNS query.
 			 * 
@@ -96,6 +97,8 @@ namespace libdane
 			 * @param callback    Callback, receiving a DANERecord list
 			 */
 			void lookupDANE(const std::string &record_name, LookupCallback callback);
+			
+			
 			
 			/**
 			 * Decodes a packet into a list of records.
