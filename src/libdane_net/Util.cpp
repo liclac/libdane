@@ -7,12 +7,16 @@ using namespace libdane::net;
 
 std::shared_ptr<ldns_rr> libdane::net::make_tlsa(Usage u, Selector sel, MatchingType mt, const Blob &data)
 {
+	uint8_t u8 = u;
+	uint8_t sel8 = sel;
+	uint8_t mt8 = mt;
+	
 	auto rr = std::shared_ptr<ldns_rr>(ldns_rr_new(), ldns_rr_free);
 	ldns_rr_set_type(&*rr, LDNS_RR_TYPE_TLSA);
 	
-	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_INT8, sizeof(u), &u));
-	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_INT8, sizeof(sel), &sel));
-	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_INT8, sizeof(mt), &mt));
+	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_INT8, sizeof(u8), &u8));
+	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_INT8, sizeof(sel8), &sel8));
+	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_INT8, sizeof(mt8), &mt8));
 	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_HEX, data.data().size(), data.data().data()));
 	
 	return rr;
