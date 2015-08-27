@@ -34,23 +34,23 @@ void Resolver::setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v) { m_e
 
 void Resolver::query(std::shared_ptr<ldns_pkt> pkt, QueryCallback cb)
 {
-	auto qbuf = std::make_shared<std::vector<unsigned char>>(this->wire(pkt));
+	auto buffer = std::make_shared<std::vector<unsigned char>>(this->wire(pkt));
 	
 	auto sock = std::make_shared<asio::ip::tcp::socket>(m_service);
-	async_connect(*sock, m_endpoints.begin(), m_endpoints.end(), [this, sock, cb, qbuf](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::iterator it) {
+	async_connect(*sock, m_endpoints.begin(), m_endpoints.end(), [this, sock, cb, buffer](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::iterator it) {
 		if (err) {
 			cb(err, {});
 			return;
 		}
 		
-		sock->async_send(asio::buffer(*qbuf), [this, sock, cb, qbuf](const asio::error_code &err, std::size_t size) {
+		sock->async_send(asio::buffer(*buffer), [this, sock, cb, buffer](const asio::error_code &err, std::size_t size) {
 			if (err) {
 				cb(err, {});
 				return;
 			}
 			
-			auto rdbuf = std::make_shared<std::vector<unsigned char>>(sizeof(uint16_t));
-			sock->async_receive(asio::buffer(*rdbuf), [this, sock, cb, rdbuf](const asio::error_code &err, std::size_t size) {
+			buffer->resize(sizeof(uint16_t));
+			sock->async_receive(asio::buffer(*buffer), [this, sock, cb, buffer](const asio::error_code &err, std::size_t size) {
 				if (err) {
 					cb(err, {});
 					return;
@@ -61,12 +61,12 @@ void Resolver::query(std::shared_ptr<ldns_pkt> pkt, QueryCallback cb)
 				}
 				
 				uint16_t len;
-				std::copy(rdbuf->begin(), rdbuf->end(), reinterpret_cast<unsigned char*>(&len));
+				std::copy(buffer->begin(), buffer->end(), reinterpret_cast<unsigned char*>(&len));
 				
 				len = ntohs(len);
-				rdbuf->resize(len);
+				buffer->resize(len);
 				
-				sock->async_receive(asio::buffer(*rdbuf), [this, sock, cb, rdbuf, len](const asio::error_code &err, std::size_t size) {
+				sock->async_receive(asio::buffer(*buffer), [this, sock, cb, buffer, len](const asio::error_code &err, std::size_t size) {
 					if (err) {
 						cb(err, {});
 						return;
@@ -77,7 +77,7 @@ void Resolver::query(std::shared_ptr<ldns_pkt> pkt, QueryCallback cb)
 					}
 					
 					ldns_pkt *packet_ptr;
-					if (ldns_wire2pkt(&packet_ptr, rdbuf->data(), rdbuf->size()) != LDNS_STATUS_OK) {
+					if (ldns_wire2pkt(&packet_ptr, buffer->data(), buffer->size()) != LDNS_STATUS_OK) {
 						throw std::runtime_error("Failed to decode response");
 					}
 					std::shared_ptr<ldns_pkt> pkt(packet_ptr, ldns_pkt_free);
