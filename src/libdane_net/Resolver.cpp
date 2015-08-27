@@ -11,8 +11,7 @@ using namespace libdane::net;
 Resolver::Resolver(asio::io_service &service):
 	m_service(service)
 {
-	// Hardcoding Google's DNS servers for now
-	// TODO: Parse /etc/resolv.conf instead
+	// Default to Google's DNS servers
 	m_endpoints.emplace_back(asio::ip::address::from_string("2001:4860:4860::8888"), 53);
 	m_endpoints.emplace_back(asio::ip::address::from_string("2001:4860:4860::8844"), 53);
 	m_endpoints.emplace_back(asio::ip::address::from_string("8.8.8.8"), 53);
