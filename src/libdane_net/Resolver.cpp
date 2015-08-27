@@ -150,13 +150,13 @@ std::vector<unsigned char> Resolver::wire(std::shared_ptr<ldns_pkt> pkt, bool tc
 		throw std::runtime_error("Couldn't convert packet to wire format");
 	}
 	
-	auto qbuf_ = std::vector<unsigned char>();
+	std::vector<unsigned char> wire;
 	if (tcp) {
 		uint16_t binlen = htons(len);
 		unsigned char *binlen_ptr = reinterpret_cast<unsigned char*>(&binlen);
-		qbuf_.insert(qbuf_.end(), binlen_ptr, binlen_ptr + sizeof(binlen));
+		wire.insert(wire.end(), binlen_ptr, binlen_ptr + sizeof(binlen));
 	}
-	qbuf_.insert(qbuf_.end(), buf, buf + len);
+	wire.insert(wire.end(), buf, buf + len);
 	
-	return qbuf_;
+	return wire;
 }
