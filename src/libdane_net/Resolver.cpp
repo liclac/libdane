@@ -32,9 +32,8 @@ void Resolver::setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v) { m_e
 
 
 
-void Resolver::query(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class, uint16_t flags, QueryCallback cb)
+void Resolver::query(std::shared_ptr<ldns_pkt> pkt, QueryCallback cb)
 {
-	auto pkt = this->makeQuery(domain, rr_type, rr_class, flags);
 	auto qbuf = std::make_shared<std::vector<unsigned char>>(this->wire(pkt));
 	
 	auto sock = std::make_shared<asio::ip::tcp::socket>(m_service);
@@ -89,18 +88,24 @@ void Resolver::query(const std::string &domain, ldns_rr_type rr_type, ldns_rr_cl
 	});
 }
 
+void Resolver::query(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class, uint16_t flags, QueryCallback cb)
+{
+	std::shared_ptr<ldns_pkt> pkt(this->makeQuery(domain, rr_type, rr_class, flags));
+	this->query(pkt, cb);
+}
+
 void Resolver::query(const std::string &domain, ldns_rr_type rr_type, QueryCallback cb)
 {
 	this->query(domain, rr_type, LDNS_RR_CLASS_IN, LDNS_RD, cb);
 }
 
-void Resolver::lookupDANE(const std::string &domain, unsigned short port, libdane::net::Protocol proto, LookupCallback cb)
+void Resolver::lookupDANE(const std::string &domain, unsigned short port, libdane::net::Protocol proto, DANECallback cb)
 {
 	std::string record_name = resource_record_name(domain, port, proto);
 	this->lookupDANE(record_name, cb);
 }
 
-void Resolver::lookupDANE(const std::string &record_name, LookupCallback cb)
+void Resolver::lookupDANE(const std::string &record_name, DANECallback cb)
 {
 	this->query(record_name, LDNS_RR_TYPE_TLSA, [=](const asio::error_code &err, std::shared_ptr<ldns_pkt> pkt) {
 		if (err) {

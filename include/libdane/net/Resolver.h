@@ -34,7 +34,7 @@ namespace libdane
 			/**
 			 * Callback type for DANE lookup functions.
 			 */
-			typedef std::function<void(const asio::error_code &err, std::deque<DANERecord>)> LookupCallback;
+			typedef std::function<void(const asio::error_code &err, std::deque<DANERecord>)> DANECallback;
 			
 			
 			
@@ -66,6 +66,14 @@ namespace libdane
 			void setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v);
 			
 			
+			
+			/**
+			 * Sends an arbitrary DNS query packet.
+			 * 
+			 * @param pkt      Packet to send
+			 * @param callback Callback for the results
+			 */
+			void query(std::shared_ptr<ldns_pkt> pkt, QueryCallback callback);
 			
 			/**
 			 * Sends an arbitrary DNS query.
@@ -105,7 +113,7 @@ namespace libdane
 			 * @param proto    Protocol to look up a service for
 			 * @param callback Callback, receiving a DANERecord list
 			 */
-			void lookupDANE(const std::string &domain, unsigned short port, libdane::net::Protocol proto, LookupCallback callback);
+			void lookupDANE(const std::string &domain, unsigned short port, libdane::net::Protocol proto, DANECallback callback);
 			
 			/**
 			 * Look up the DANE record for the given resource.
@@ -113,7 +121,7 @@ namespace libdane
 			 * @param record_name A record name, in the format _port._proto.domain
 			 * @param callback    Callback, receiving a DANERecord list
 			 */
-			void lookupDANE(const std::string &record_name, LookupCallback callback);
+			void lookupDANE(const std::string &record_name, DANECallback callback);
 			
 			
 			
