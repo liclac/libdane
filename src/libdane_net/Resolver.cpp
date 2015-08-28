@@ -32,59 +32,31 @@ void Resolver::setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v) { m_e
 
 
 
-void Resolver::query(std::shared_ptr<ldns_pkt> pkt, QueryCallback cb)
+void Resolver::query(std::vector<std::shared_ptr<ldns_pkt>> pkts, MultiQueryCallback cb)
 {
-	auto buffer = std::make_shared<std::vector<unsigned char>>(this->wire(pkt));
+	if (!pkts.size()) {
+		cb({}, {});
+	}
+	
+	auto ctx = std::make_shared<ConnectionContext>();
+	ctx->pkts = pkts;
+	ctx->it = ctx->pkts.begin();
 	
 	auto sock = std::make_shared<asio::ip::tcp::socket>(m_service);
-	async_connect(*sock, m_endpoints.begin(), m_endpoints.end(), [this, sock, cb, buffer](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::iterator it) {
+	async_connect(*sock, m_endpoints.begin(), m_endpoints.end(), [=](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::iterator it) {
 		if (err) {
 			cb(err, {});
 			return;
 		}
 		
-		sock->async_send(asio::buffer(*buffer), [this, sock, cb, buffer](const asio::error_code &err, std::size_t size) {
-			if (err) {
-				cb(err, {});
-				return;
-			}
-			
-			buffer->resize(sizeof(uint16_t));
-			sock->async_receive(asio::buffer(*buffer), [this, sock, cb, buffer](const asio::error_code &err, std::size_t size) {
-				if (err) {
-					cb(err, {});
-					return;
-				}
-				
-				if (size != sizeof(uint16_t)) {
-					throw std::runtime_error("Invalid number of bytes read (response size)");
-				}
-				
-				uint16_t len;
-				std::copy(buffer->begin(), buffer->end(), reinterpret_cast<unsigned char*>(&len));
-				
-				len = ntohs(len);
-				buffer->resize(len);
-				
-				sock->async_receive(asio::buffer(*buffer), [this, sock, cb, buffer, len](const asio::error_code &err, std::size_t size) {
-					if (err) {
-						cb(err, {});
-						return;
-					}
-					
-					if (size != len) {
-						throw std::runtime_error("Invalid number of bytes read (response data)");
-					}
-					
-					ldns_pkt *packet_ptr;
-					if (ldns_wire2pkt(&packet_ptr, buffer->data(), buffer->size()) != LDNS_STATUS_OK) {
-						throw std::runtime_error("Failed to decode response");
-					}
-					std::shared_ptr<ldns_pkt> pkt(packet_ptr, ldns_pkt_free);
-					cb({}, pkt);
-				});
-			});
-		});
+		this->sendQueryChain(sock, ctx, cb);
+	});
+}
+
+void Resolver::query(std::shared_ptr<ldns_pkt> pkt, QueryCallback cb)
+{
+	this->query({pkt}, [=](const asio::error_code &err, std::vector<std::shared_ptr<ldns_pkt>> pkts) {
+		cb(err, pkts.size() > 0 ? pkts[0] : nullptr);
 	});
 }
 
@@ -159,4 +131,74 @@ std::vector<unsigned char> Resolver::wire(std::shared_ptr<ldns_pkt> pkt, bool tc
 	wire.insert(wire.end(), buf, buf + len);
 	
 	return wire;
+}
+
+std::shared_ptr<ldns_pkt> Resolver::unwire(const std::vector<unsigned char> &wire)
+{
+	ldns_pkt *packet_ptr;
+	if (ldns_wire2pkt(&packet_ptr, wire.data(), wire.size()) != LDNS_STATUS_OK) {
+		throw std::runtime_error("Failed to decode response");
+	}
+	return std::shared_ptr<ldns_pkt>(packet_ptr, ldns_pkt_free);
+}
+
+void Resolver::sendQuery(std::shared_ptr<asio::ip::tcp::socket> sock, std::vector<unsigned char> &buffer, std::function<void(const asio::error_code &err)> cb)
+{
+	sock->async_send(asio::buffer(buffer), [sock, &buffer, cb](const asio::error_code &err, std::size_t size) mutable {
+		if (err) {
+			cb(err);
+			return;
+		}
+		
+		buffer.resize(sizeof(uint16_t));
+		sock->async_receive(asio::buffer(buffer), [sock, &buffer, cb](const asio::error_code &err, std::size_t size) mutable {
+			if (err) {
+				cb(err);
+				return;
+			}
+			
+			if (size != sizeof(uint16_t)) {
+				throw std::runtime_error("Invalid number of bytes read (response size)");
+			}
+			
+			uint16_t len;
+			std::copy(buffer.begin(), buffer.end(), reinterpret_cast<unsigned char*>(&len));
+			
+			len = ntohs(len);
+			buffer.resize(len);
+			
+			sock->async_receive(asio::buffer(buffer), [sock, &buffer, cb, len](const asio::error_code &err, std::size_t size) mutable {
+				if (err) {
+					cb(err);
+					return;
+				}
+				
+				if (size != len) {
+					throw std::runtime_error("Invalid number of bytes read (response data)");
+				}
+				
+				cb({});
+			});
+		});
+	});
+}
+
+void Resolver::sendQueryChain(std::shared_ptr<asio::ip::tcp::socket> sock, std::shared_ptr<ConnectionContext> ctx, MultiQueryCallback cb)
+{
+	ctx->buffer = this->wire(*ctx->it);
+	this->sendQuery(sock, ctx->buffer, [=](const asio::error_code &err) mutable {
+		if (err) {
+			cb(err, {});
+			return;
+		}
+		
+		*(ctx->it) = this->unwire(ctx->buffer);
+		++(ctx->it);
+		if (ctx->it == ctx->pkts.end()) {
+			cb({}, ctx->pkts);
+			return;
+		}
+		
+		this->sendQueryChain(sock, ctx, cb);
+	});
 }

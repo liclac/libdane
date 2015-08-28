@@ -27,6 +27,11 @@ namespace libdane
 		{
 		public:
 			/**
+			 * Callback type for multi-query functions.
+			 */
+			typedef std::function<void(const asio::error_code &err, std::vector<std::shared_ptr<ldns_pkt>> pkts)> MultiQueryCallback;
+			
+			/**
 			 * Callback type for query functions.
 			 */
 			typedef std::function<void(const asio::error_code &err, std::shared_ptr<ldns_pkt> pkt)> QueryCallback;
@@ -66,6 +71,13 @@ namespace libdane
 			void setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v);
 			
 			
+			/**
+			 * Sends a batch of DNS query packets.
+			 * 
+			 * @param pkts     Packets to send
+			 * @param callback Callback for the results
+			 */
+			void query(std::vector<std::shared_ptr<ldns_pkt>> pkts, MultiQueryCallback callback);
 			
 			/**
 			 * Sends an arbitrary DNS query packet.
@@ -149,6 +161,40 @@ namespace libdane
 			 * @return The packet in binary wire format
 			 */
 			std::vector<unsigned char> wire(std::shared_ptr<ldns_pkt> pkt, bool tcp = true);
+			
+			/**
+			 * Decodes a DNS packet from wire format.
+			 * 
+			 * @param  wire Wire representation of the packet
+			 * @return A decoded packet
+			 */
+			std::shared_ptr<ldns_pkt> unwire(const std::vector<unsigned char> &wire);
+			
+		protected:
+			struct ConnectionContext {
+				std::vector<unsigned char> buffer;
+				
+				std::vector<std::shared_ptr<ldns_pkt>> pkts;
+				std::vector<std::shared_ptr<ldns_pkt>>::iterator it;
+			};
+			
+			/**
+			 * Sends a query buffer through an open socket.
+			 */
+			void sendQuery(std::shared_ptr<asio::ip::tcp::socket> sock, std::vector<unsigned char> &buffer, std::function<void(const asio::error_code &err)>);
+			
+			/**
+			 * Recursively sends the queries described by a context.
+			 * 
+			 * This will wire-encode the packet described by ctx->it, replace
+			 * it with the result, advance ctx->it and call itself again until
+			 * ctx->it == ctx->pkts.end().
+			 * 
+			 * @param sock Socket
+			 * @param ctx  Context descriptor
+			 * @param cb   Callback when finished
+			 */
+			void sendQueryChain(std::shared_ptr<asio::ip::tcp::socket> sock, std::shared_ptr<ConnectionContext> ctx, MultiQueryCallback cb);
 			
 		protected:
 			/**
