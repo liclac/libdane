@@ -1,4 +1,5 @@
 #include <libdane/Blob.h>
+#include <libdane/Util.h>
 #include <memory>
 #include <sstream>
 #include <iomanip>
@@ -8,15 +9,7 @@ using namespace libdane;
 Blob Blob::fromHex(const std::string &str)
 {
 	std::vector<unsigned char> data;
-	std::stringstream ss;
-	for (int offset = 0; offset < str.size(); offset += 2) {
-		ss.clear();
-		ss << std::hex << str.substr(offset, 2);
-		
-		unsigned int tmp;
-		ss >> tmp;
-		data.push_back(static_cast<unsigned char>(tmp));
-	}
+	from_hex(std::back_inserter(data), str.begin(), str.end());
 	
 	return Blob(data);
 }
@@ -89,12 +82,7 @@ Blob Blob::match(MatchingType mtype) const
 
 std::string Blob::hex() const
 {
-	std::stringstream ss;
-	ss << std::hex << std::setfill('0');
-	for (auto it = m_data.begin(); it != m_data.end(); ++it) {
-		ss << std::setw(2) << static_cast<int>(*it);
-	}
-	return ss.str();
+	return to_hex(m_data.begin(), m_data.end());
 }
 
 Blob Blob::hash(const EVP_MD *type) const
