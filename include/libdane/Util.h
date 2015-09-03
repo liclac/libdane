@@ -13,7 +13,7 @@ namespace libdane
 	 * Verifies a VerifyContext against a list of DANERecords.
 	 */
 	template<typename IterT>
-	bool verify(bool preverified, const VerifyContext &ctx, IterT begin, IterT end)
+	inline bool verify(bool preverified, const VerifyContext &ctx, IterT begin, IterT end)
 	{
 		for (IterT it = begin; it != end; ++it) {
 			const DANERecord &rec = *it;
@@ -34,7 +34,7 @@ namespace libdane
 	 * @return A hexadecimal string
 	 */
 	template<typename T = unsigned char, typename IterT>
-	std::string to_hex(IterT begin, IterT end)
+	inline std::string to_hex(IterT begin, IterT end)
 	{
 		std::stringstream ss;
 		ss << std::hex << std::setfill('0');
@@ -54,7 +54,7 @@ namespace libdane
 	 * @return Iterator past the last element inserted, or first if no elements were inserted
 	 */
 	template<typename T = unsigned char, typename OutputIt, typename StringIt>
-	OutputIt from_hex(OutputIt first, StringIt begin, StringIt end)
+	inline OutputIt from_hex(OutputIt first, StringIt begin, StringIt end)
 	{
 		auto it = begin;
 		while (it != end) {
