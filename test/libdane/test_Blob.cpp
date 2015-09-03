@@ -52,7 +52,7 @@ SCENARIO("Decoding of hex strings works")
 		
 		THEN("The resulting blob should be full of zeroes, not crash")
 		{
-			REQUIRE(blob.hex() == "00000000000000000000000000");
+			REQUIRE(blob.hex() == "0000000000000d000000000a0e");
 		}
 	}
 }
