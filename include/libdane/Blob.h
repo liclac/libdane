@@ -1,9 +1,9 @@
 #ifndef LIBDANE_BLOB_H
 #define LIBDANE_BLOB_H
 
-#include <vector>
-#include <asio/ssl.hpp>
+#include "_internal/openssl.h"
 #include "common.h"
+#include <vector>
 
 namespace libdane
 {

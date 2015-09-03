@@ -2,9 +2,9 @@
 #define LIBDANE_NET_RESOLVER_H
 
 #include "_internal/include_ldns.h"
+#include "../_internal/openssl.h"
 #include "common.h"
 #include <asio.hpp>
-#include <asio/ssl.hpp>
 #include <deque>
 #include <memory>
 

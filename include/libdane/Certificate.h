@@ -1,7 +1,7 @@
 #ifndef LIBDANE_X509_H
 #define LIBDANE_X509_H
 
-#include <asio/ssl.hpp>
+#include "_internal/openssl.h"
 #include "Blob.h"
 #include "common.h"
 #include <deque>

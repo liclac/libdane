@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <asio/ssl.hpp>
+#include "_internal/openssl.h"
 #include "VerifyContext.h"
 #include "Blob.h"
 #include "common.h"

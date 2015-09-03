@@ -1,8 +1,8 @@
 #ifndef LIBDANE_VERIFYCONTEXT_H
 #define LIBDANE_VERIFYCONTEXT_H
 
+#include "_internal/openssl.h"
 #include "Certificate.h"
-#include <asio/ssl.hpp>
 #include <deque>
 
 namespace libdane
@@ -26,13 +26,6 @@ namespace libdane
 		 * @param ctx Underlying context
 		 */
 		VerifyContext(X509_STORE_CTX *ctx = nullptr);
-		
-		/**
-		 * Convenience constructor.
-		 * 
-		 * This is the same as calling `VerifyContext(vc.native_handle())`.
-		 */
-		VerifyContext(asio::ssl::verify_context &vc);
 		
 		/**
 		 * Copy constructor.

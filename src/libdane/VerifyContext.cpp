@@ -12,9 +12,6 @@ VerifyContext::VerifyContext(X509_STORE_CTX *ctx):
 	}
 }
 
-VerifyContext::VerifyContext(asio::ssl::verify_context &vc):
-	VerifyContext(vc.native_handle()) {}
-
 VerifyContext::VerifyContext(const VerifyContext &store):
 	VerifyContext(store.ctx()) {}
 
