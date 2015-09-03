@@ -1,7 +1,7 @@
 #ifndef LIBDANE_NET_RESOLVER_H
 #define LIBDANE_NET_RESOLVER_H
 
-#include "_internal/include_ldns.h"
+#include "_internal/ldns.h"
 #include "../_internal/openssl.h"
 #include "common.h"
 #include <asio.hpp>

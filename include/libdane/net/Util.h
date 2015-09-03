@@ -2,7 +2,7 @@
 #define LIBDANE_NET_UTIL_H
 
 #include "common.h"
-#include "_internal/include_ldns.h"
+#include "_internal/ldns.h"
 #include "../DANERecord.h"
 
 namespace libdane
