@@ -73,6 +73,27 @@ namespace libdane
 		
 		return first;
 	}
+	
+	/**
+	 * Decodes a hexadecimal string.
+	 * 
+	 * This is a convenience function for decoding straight into a newly
+	 * constructed container.
+	 * 
+	 * @tparam T Type to cast values through
+	 * @tparam ContainerT Container type to fill up
+	 * @param begin Iterator to the start of the string
+	 * @param end Iterator to the end of the string
+	 * @return A new ContainerT with the decoded data
+	 */
+	template<typename T = unsigned char, typename ContainerT = std::vector<unsigned char>, typename StringIt>
+	inline ContainerT from_hex(StringIt begin, StringIt end)
+	{
+		ContainerT container;
+		container.reserve(std::distance(begin, end) / 2);
+		from_hex<T>(std::back_inserter(container), begin, end);
+		return container;
+	}
 }
 
 #endif

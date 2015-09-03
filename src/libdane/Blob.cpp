@@ -8,10 +8,7 @@ using namespace libdane;
 
 Blob Blob::fromHex(const std::string &str)
 {
-	std::vector<unsigned char> data;
-	from_hex(std::back_inserter(data), str.begin(), str.end());
-	
-	return Blob(data);
+	return from_hex(str.begin(), str.end());
 }
 
 
