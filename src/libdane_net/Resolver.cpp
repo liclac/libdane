@@ -81,19 +81,21 @@ void Resolver::lookupDANE(const std::string &record_name, DANECallback cb)
 {
 	this->query(record_name, LDNS_RR_TYPE_TLSA, [=](const asio::error_code &err, std::shared_ptr<ldns_pkt> pkt) {
 		if (err) {
-			cb(err, {});
+			cb(err, {}, false);
 			return;
 		}
 		
-		cb({}, this->decodeTLSA(pkt));
+		cb({}, this->decodeTLSA(pkt), false);
 	});
 }
 
-std::deque<DANERecord> Resolver::decodeTLSA(std::shared_ptr<ldns_pkt> pkt)
+std::vector<DANERecord> Resolver::decodeTLSA(std::shared_ptr<ldns_pkt> pkt)
 {
-	std::deque<DANERecord> records;
-	
 	std::shared_ptr<ldns_rr_list> tlsas(ldns_pkt_rr_list_by_type(&*pkt, LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER), ldns_rr_list_deep_free);
+	
+	std::vector<DANERecord> records;
+	records.reserve(ldns_rr_list_rr_count(&*tlsas));
+	
 	for (size_t i = 0; i < ldns_rr_list_rr_count(&*tlsas); ++i) {
 		ldns_rr *tlsa = ldns_rr_list_rr(&*tlsas, i);
 		records.push_back(record_from_tlsa(tlsa));

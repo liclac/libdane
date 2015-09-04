@@ -28,7 +28,11 @@ int App::run(const std::vector<std::string> &args_)
 	daneres.setEndpoints(ResolverConfig::loadResolvConf());
 	
 	// Look up the DANE record for the mail server on the domain
-	daneres.lookupDANE(args.domain, 25, TCP, [&](const asio::error_code &err, std::deque<DANERecord> records) {
+	daneres.lookupDANE(args.domain, 25, TCP, [&](const asio::error_code &err, std::vector<DANERecord> records, bool dnssec) {
+		if (!dnssec) {
+			std::cerr << "WARNING: No valid DNSSEC signature! These records cannot be trusted." << std::endl;
+		}
+		
 		for (auto it = records.begin(); it != records.end(); ++it) {
 			std::cout << it->toString() << std::endl;
 		}
@@ -42,7 +46,7 @@ int App::run(const std::vector<std::string> &args_)
 	return 0;
 }
 
-void App::connectSMTP(const std::string &domain, unsigned short port, std::deque<libdane::DANERecord> records)
+void App::connectSMTP(const std::string &domain, unsigned short port, std::vector<libdane::DANERecord> records)
 {
 	ip::tcp::resolver::query q(args.domain, std::to_string(port));
 	dnsres.async_resolve(q, [this, records](const error_code& err, ip::tcp::resolver::iterator it) {
@@ -119,7 +123,7 @@ void App::connectSMTP(const std::string &domain, unsigned short port, std::deque
 	});
 }
 
-void App::handshake(std::shared_ptr<asio::ip::tcp::socket> plain_sock, std::deque<libdane::DANERecord> records)
+void App::handshake(std::shared_ptr<asio::ip::tcp::socket> plain_sock, std::vector<libdane::DANERecord> records)
 {
 	auto ctx = std::make_shared<ssl::context>(asio::ssl::context::sslv23);
 	ctx->set_verify_mode(asio::ssl::verify_peer);

@@ -39,7 +39,7 @@ namespace libdane
 			/**
 			 * Callback type for DANE lookup functions.
 			 */
-			typedef std::function<void(const asio::error_code &err, std::deque<DANERecord>)> DANECallback;
+			typedef std::function<void(const asio::error_code &err, std::vector<DANERecord> records, bool dnssec)> DANECallback;
 			
 			
 			
@@ -140,7 +140,7 @@ namespace libdane
 			/**
 			 * Decodes a packet into a list of records.
 			 */
-			std::deque<DANERecord> decodeTLSA(std::shared_ptr<ldns_pkt> pkt);
+			std::vector<DANERecord> decodeTLSA(std::shared_ptr<ldns_pkt> pkt);
 			
 			/**
 			 * Constructs a query packet.

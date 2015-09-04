@@ -36,7 +36,7 @@ protected:
 	 * 
 	 * @param records A list of DANE records for the domain.
 	 */
-	void connectSMTP(const std::string &domain, unsigned short port, std::deque<libdane::DANERecord> records);
+	void connectSMTP(const std::string &domain, unsigned short port, std::vector<libdane::DANERecord> records);
 	
 	/**
 	 * Verifies an endpoint's presented certificate against a list of DANE records.
@@ -44,7 +44,7 @@ protected:
 	 * @param sock     Socket to initiate a TLS handshake on
 	 * @param records  Records to verify against
 	 */
-	void handshake(std::shared_ptr<asio::ip::tcp::socket> sock, std::deque<libdane::DANERecord> records);
+	void handshake(std::shared_ptr<asio::ip::tcp::socket> sock, std::vector<libdane::DANERecord> records);
 	
 	/**
 	 * Parses commandline arguments.
