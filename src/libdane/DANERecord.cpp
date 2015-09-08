@@ -1,3 +1,10 @@
+/**
+ * DANERecord.cpp
+ * libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include <libdane/DANERecord.h>
 #include <iostream>
 #include <sstream>

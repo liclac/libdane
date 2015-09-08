@@ -1,3 +1,10 @@
+/**
+ * Blob.h
+ * libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #ifndef LIBDANE_BLOB_H
 #define LIBDANE_BLOB_H
 

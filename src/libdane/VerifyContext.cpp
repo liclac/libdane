@@ -1,3 +1,10 @@
+/**
+ * VerifyContext.cpp
+ * libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include <libdane/VerifyContext.h>
 
 using namespace libdane;

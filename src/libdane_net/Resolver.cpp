@@ -1,3 +1,10 @@
+/**
+ * Resolver.cpp
+ * libdane_net
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include <libdane/net/Resolver.h>
 #include <libdane/DANERecord.h>
 #include <libdane/Util.h>

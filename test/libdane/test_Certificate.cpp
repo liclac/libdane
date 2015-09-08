@@ -1,3 +1,10 @@
+/**
+ * test_Certificate.cpp
+ * test_libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include <catch.hpp>
 #include <libdane/Certificate.h>
 #include "../resources.h"

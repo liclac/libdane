@@ -1,3 +1,10 @@
+/**
+ * App.h
+ * danetool
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #ifndef DANETOOL_APP_H
 #define DANETOOL_APP_H
 

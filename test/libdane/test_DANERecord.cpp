@@ -1,3 +1,10 @@
+/**
+ * test_DANERecord.cpp
+ * test_libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include <catch.hpp>
 #include <libdane/DANERecord.h>
 #include <libdane/Certificate.h>

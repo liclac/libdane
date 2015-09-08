@@ -1,3 +1,10 @@
+/**
+ * Blob.cpp
+ * libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include <libdane/Blob.h>
 #include <libdane/Util.h>
 #include <memory>

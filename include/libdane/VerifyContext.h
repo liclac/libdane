@@ -1,3 +1,10 @@
+/**
+ * VerifyContext.h
+ * libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #ifndef LIBDANE_VERIFYCONTEXT_H
 #define LIBDANE_VERIFYCONTEXT_H
 

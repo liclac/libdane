@@ -1,3 +1,10 @@
+/**
+ * resources.cpp
+ * test_libdane, test_libdane_net
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include "resources.h"
 
 const char* libdane::resources::googlePEM =

@@ -1,3 +1,10 @@
+/**
+ * Util.cpp
+ * libdane_net
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include <libdane/net/Util.h>
 #include <libdane/common.h>
 #include <sstream>

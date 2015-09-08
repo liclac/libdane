@@ -1,3 +1,10 @@
+/**
+ * Resolver.h
+ * libdane_net
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #ifndef LIBDANE_NET_RESOLVER_H
 #define LIBDANE_NET_RESOLVER_H
 

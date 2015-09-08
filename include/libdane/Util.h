@@ -1,3 +1,10 @@
+/**
+ * Util.h
+ * libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #ifndef LIBDANE_UTIL_H
 #define LIBDANE_UTIL_H
 

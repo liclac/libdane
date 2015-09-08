@@ -1,3 +1,10 @@
+/**
+ * test_Util.cpp
+ * test_libdane_net
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include <catch.hpp>
 #include <libdane/net/Util.h>
 

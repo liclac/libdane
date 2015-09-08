@@ -1,3 +1,10 @@
+/**
+ * Certificate.cpp
+ * libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include <libdane/Certificate.h>
 #include <regex>
 

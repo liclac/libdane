@@ -1,5 +1,12 @@
-#ifndef LIBDANE_X509_H
-#define LIBDANE_X509_H
+/**
+ * Certificate.h
+ * libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
+#ifndef LIBDANE_CERTIFICATE_H
+#define LIBDANE_CERTIFICATE_H
 
 #include "_internal/openssl.h"
 #include "Blob.h"

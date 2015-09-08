@@ -1,3 +1,10 @@
+/**
+ * ResolverConfig.cpp
+ * libdane_net
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #include <libdane/net/ResolverConfig.h>
 #include <fstream>
 #include <sstream>
