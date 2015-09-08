@@ -69,6 +69,14 @@ namespace libdane
 			
 			
 			/**
+			 * Loads configuration from the system's default source.
+			 * 
+			 * On *nix-based systems, this is the file /etc/resolv.conf.
+			 * On Windows, this is the default registry key.
+			 */
+			bool load();
+			
+			/**
 			 * Loads the system's resolv.conf file.
 			 * 
 			 * This is a blocking operation, and will replace current values.

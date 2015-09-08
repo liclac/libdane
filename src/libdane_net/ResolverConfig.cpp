@@ -28,6 +28,11 @@ ResolverConfig::~ResolverConfig()
 const std::vector<asio::ip::tcp::endpoint>& ResolverConfig::endpoints() const { return m_endpoints; }
 void ResolverConfig::setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v) { m_endpoints = v; }
 
+bool ResolverConfig::load()
+{
+	return this->loadResolvConf();
+}
+
 bool ResolverConfig::loadResolvConf(const std::string &path)
 {
 	std::fstream fs(path, std::ios::binary|std::ios::in);
