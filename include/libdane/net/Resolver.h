@@ -84,6 +84,42 @@ namespace libdane
 			void setConfig(const ResolverConfig& v);
 			
 			
+			
+			/**
+			 * Decodes a packet into a list of records.
+			 */
+			std::vector<DANERecord> decodeTLSA(std::shared_ptr<ldns_pkt> pkt);
+			
+			/**
+			 * Constructs a query packet.
+			 * 
+			 * @param  domain Domain to query
+			 * @param  rr_type  Record type to query for (eg. LDNS_RR_TYPE_A)
+			 * @param  rr_class Record class to query for (eg. LDNS_RR_CLASS_IN)
+			 * @param  flags    Query flags (eg. LDNS_RD)
+			 * @return A DNS packet structure
+			 */
+			std::shared_ptr<ldns_pkt> makeQuery(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class = LDNS_RR_CLASS_IN, uint16_t flags = LDNS_RD);
+			
+			/**
+			 * Formats a DNS packet to wire format.
+			 * 
+			 * @param  pkt A DNS packet to format
+			 * @param  tcp Format for TCP (with a length prefix)
+			 * @return The packet in binary wire format
+			 */
+			std::vector<unsigned char> wire(std::shared_ptr<ldns_pkt> pkt, bool tcp);
+			
+			/**
+			 * Decodes a DNS packet from wire format.
+			 * 
+			 * @param  wire Wire representation of the packet
+			 * @return A decoded packet
+			 */
+			std::shared_ptr<ldns_pkt> unwire(const std::vector<unsigned char> &wire);
+			
+			
+			
 			/**
 			 * Sends a batch of DNS query packets.
 			 * 
@@ -148,41 +184,6 @@ namespace libdane
 			 */
 			void lookupDANE(const std::string &record_name, DANECallback callback);
 			
-			
-			
-			/**
-			 * Decodes a packet into a list of records.
-			 */
-			std::vector<DANERecord> decodeTLSA(std::shared_ptr<ldns_pkt> pkt);
-			
-			/**
-			 * Constructs a query packet.
-			 * 
-			 * @param  domain Domain to query
-			 * @param  rr_type  Record type to query for (eg. LDNS_RR_TYPE_A)
-			 * @param  rr_class Record class to query for (eg. LDNS_RR_CLASS_IN)
-			 * @param  flags    Query flags (eg. LDNS_RD)
-			 * @return A DNS packet structure
-			 */
-			std::shared_ptr<ldns_pkt> makeQuery(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class = LDNS_RR_CLASS_IN, uint16_t flags = LDNS_RD);
-			
-			/**
-			 * Formats a DNS packet to wire format.
-			 * 
-			 * @param  pkt A DNS packet to format
-			 * @param  tcp Format for TCP (with a length prefix)
-			 * @return The packet in binary wire format
-			 */
-			std::vector<unsigned char> wire(std::shared_ptr<ldns_pkt> pkt, bool tcp);
-			
-			/**
-			 * Decodes a DNS packet from wire format.
-			 * 
-			 * @param  wire Wire representation of the packet
-			 * @return A decoded packet
-			 */
-			std::shared_ptr<ldns_pkt> unwire(const std::vector<unsigned char> &wire);
-			
 		protected:
 			/**
 			 * Connection context structure.
@@ -198,11 +199,6 @@ namespace libdane
 			};
 			
 			/**
-			 * Sends a query buffer through an open socket.
-			 */
-			void sendQuery(std::shared_ptr<asio::ip::tcp::socket> sock, std::vector<unsigned char> &buffer, std::function<void(const asio::error_code &err)>);
-			
-			/**
 			 * Recursively sends the queries described by a context.
 			 * 
 			 * This will wire-encode the packet described by ctx->it, replace
@@ -214,6 +210,11 @@ namespace libdane
 			 * @param cb   Callback when finished
 			 */
 			void sendQueryChain(std::shared_ptr<asio::ip::tcp::socket> sock, std::shared_ptr<ConnectionContext> ctx, MultiQueryCallback cb);
+			
+			/**
+			 * Sends a query buffer through an open socket.
+			 */
+			void sendQuery(std::shared_ptr<asio::ip::tcp::socket> sock, std::vector<unsigned char> &buffer, std::function<void(const asio::error_code &err)>);
 			
 		protected:
 			/**

@@ -36,6 +36,63 @@ void Resolver::setConfig(const ResolverConfig& v) { m_config = v; }
 
 
 
+std::vector<DANERecord> Resolver::decodeTLSA(std::shared_ptr<ldns_pkt> pkt)
+{
+	std::shared_ptr<ldns_rr_list> tlsas(ldns_pkt_rr_list_by_type(&*pkt, LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER), ldns_rr_list_deep_free);
+	
+	std::vector<DANERecord> records;
+	records.reserve(ldns_rr_list_rr_count(&*tlsas));
+	
+	for (size_t i = 0; i < ldns_rr_list_rr_count(&*tlsas); ++i) {
+		ldns_rr *tlsa = ldns_rr_list_rr(&*tlsas, i);
+		records.push_back(record_from_tlsa(tlsa));
+	}
+	
+	return records;
+}
+
+std::shared_ptr<ldns_pkt> Resolver::makeQuery(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class, uint16_t flags)
+{
+	ldns_rdf *dname = ldns_dname_new_frm_str(domain.c_str());
+	std::shared_ptr<ldns_pkt> pkt(ldns_pkt_query_new(dname, rr_type, rr_class, flags), ldns_pkt_free);
+	if (!pkt) {
+		throw std::runtime_error("Couldn't create a query packet");
+	}
+	ldns_pkt_set_id(&*pkt, 1337);
+	
+	return pkt;
+}
+
+std::vector<unsigned char> Resolver::wire(std::shared_ptr<ldns_pkt> pkt, bool tcp)
+{
+	uint8_t *buf;
+	std::size_t len;
+	if (ldns_pkt2wire(&buf, &*pkt, &len) != LDNS_STATUS_OK) {
+		throw std::runtime_error("Couldn't convert packet to wire format");
+	}
+	
+	std::vector<unsigned char> wire;
+	if (tcp) {
+		uint16_t binlen = htons(len);
+		unsigned char *binlen_ptr = reinterpret_cast<unsigned char*>(&binlen);
+		wire.insert(wire.end(), binlen_ptr, binlen_ptr + sizeof(binlen));
+	}
+	wire.insert(wire.end(), buf, buf + len);
+	
+	return wire;
+}
+
+std::shared_ptr<ldns_pkt> Resolver::unwire(const std::vector<unsigned char> &wire)
+{
+	ldns_pkt *packet_ptr;
+	if (ldns_wire2pkt(&packet_ptr, wire.data(), wire.size()) != LDNS_STATUS_OK) {
+		throw std::runtime_error("Failed to decode response");
+	}
+	return std::shared_ptr<ldns_pkt>(packet_ptr, ldns_pkt_free);
+}
+
+
+
 void Resolver::query(std::vector<std::shared_ptr<ldns_pkt>> pkts, MultiQueryCallback cb)
 {
 	if (!pkts.size()) {
@@ -94,59 +151,24 @@ void Resolver::lookupDANE(const std::string &record_name, DANECallback cb)
 	});
 }
 
-std::vector<DANERecord> Resolver::decodeTLSA(std::shared_ptr<ldns_pkt> pkt)
+void Resolver::sendQueryChain(std::shared_ptr<asio::ip::tcp::socket> sock, std::shared_ptr<ConnectionContext> ctx, MultiQueryCallback cb)
 {
-	std::shared_ptr<ldns_rr_list> tlsas(ldns_pkt_rr_list_by_type(&*pkt, LDNS_RR_TYPE_TLSA, LDNS_SECTION_ANSWER), ldns_rr_list_deep_free);
-	
-	std::vector<DANERecord> records;
-	records.reserve(ldns_rr_list_rr_count(&*tlsas));
-	
-	for (size_t i = 0; i < ldns_rr_list_rr_count(&*tlsas); ++i) {
-		ldns_rr *tlsa = ldns_rr_list_rr(&*tlsas, i);
-		records.push_back(record_from_tlsa(tlsa));
-	}
-	
-	return records;
-}
-
-std::shared_ptr<ldns_pkt> Resolver::makeQuery(const std::string &domain, ldns_rr_type rr_type, ldns_rr_class rr_class, uint16_t flags)
-{
-	ldns_rdf *dname = ldns_dname_new_frm_str(domain.c_str());
-	std::shared_ptr<ldns_pkt> pkt(ldns_pkt_query_new(dname, rr_type, rr_class, flags), ldns_pkt_free);
-	if (!pkt) {
-		throw std::runtime_error("Couldn't create a query packet");
-	}
-	ldns_pkt_set_id(&*pkt, 1337);
-	
-	return pkt;
-}
-
-std::vector<unsigned char> Resolver::wire(std::shared_ptr<ldns_pkt> pkt, bool tcp)
-{
-	uint8_t *buf;
-	std::size_t len;
-	if (ldns_pkt2wire(&buf, &*pkt, &len) != LDNS_STATUS_OK) {
-		throw std::runtime_error("Couldn't convert packet to wire format");
-	}
-	
-	std::vector<unsigned char> wire;
-	if (tcp) {
-		uint16_t binlen = htons(len);
-		unsigned char *binlen_ptr = reinterpret_cast<unsigned char*>(&binlen);
-		wire.insert(wire.end(), binlen_ptr, binlen_ptr + sizeof(binlen));
-	}
-	wire.insert(wire.end(), buf, buf + len);
-	
-	return wire;
-}
-
-std::shared_ptr<ldns_pkt> Resolver::unwire(const std::vector<unsigned char> &wire)
-{
-	ldns_pkt *packet_ptr;
-	if (ldns_wire2pkt(&packet_ptr, wire.data(), wire.size()) != LDNS_STATUS_OK) {
-		throw std::runtime_error("Failed to decode response");
-	}
-	return std::shared_ptr<ldns_pkt>(packet_ptr, ldns_pkt_free);
+	ctx->buffer = this->wire(*ctx->it, true);
+	this->sendQuery(sock, ctx->buffer, [=](const asio::error_code &err) mutable {
+		if (err) {
+			cb(err, {});
+			return;
+		}
+		
+		*(ctx->it) = this->unwire(ctx->buffer);
+		++(ctx->it);
+		if (ctx->it == ctx->pkts.end()) {
+			cb({}, ctx->pkts);
+			return;
+		}
+		
+		this->sendQueryChain(sock, ctx, cb);
+	});
 }
 
 void Resolver::sendQuery(std::shared_ptr<asio::ip::tcp::socket> sock, std::vector<unsigned char> &buffer, std::function<void(const asio::error_code &err)> cb)
@@ -187,25 +209,5 @@ void Resolver::sendQuery(std::shared_ptr<asio::ip::tcp::socket> sock, std::vecto
 				cb({});
 			});
 		});
-	});
-}
-
-void Resolver::sendQueryChain(std::shared_ptr<asio::ip::tcp::socket> sock, std::shared_ptr<ConnectionContext> ctx, MultiQueryCallback cb)
-{
-	ctx->buffer = this->wire(*ctx->it, true);
-	this->sendQuery(sock, ctx->buffer, [=](const asio::error_code &err) mutable {
-		if (err) {
-			cb(err, {});
-			return;
-		}
-		
-		*(ctx->it) = this->unwire(ctx->buffer);
-		++(ctx->it);
-		if (ctx->it == ctx->pkts.end()) {
-			cb({}, ctx->pkts);
-			return;
-		}
-		
-		this->sendQueryChain(sock, ctx, cb);
 	});
 }
