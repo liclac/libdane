@@ -18,11 +18,7 @@ using namespace libdane::net;
 Resolver::Resolver(asio::io_service &service):
 	m_service(service)
 {
-	// Default to Google's DNS servers
-	m_endpoints.emplace_back(asio::ip::address::from_string("2001:4860:4860::8888"), 53);
-	m_endpoints.emplace_back(asio::ip::address::from_string("2001:4860:4860::8844"), 53);
-	m_endpoints.emplace_back(asio::ip::address::from_string("8.8.8.8"), 53);
-	m_endpoints.emplace_back(asio::ip::address::from_string("8.8.4.4"), 53);
+	
 }
 
 Resolver::~Resolver()
@@ -34,8 +30,9 @@ Resolver::~Resolver()
 
 asio::io_service& Resolver::service() const { return m_service; }
 
-const std::vector<asio::ip::tcp::endpoint>& Resolver::endpoints() const { return m_endpoints; }
-void Resolver::setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v) { m_endpoints = v; }
+const ResolverConfig& Resolver::config() const { return m_config; }
+ResolverConfig& Resolver::config() { return m_config; }
+void Resolver::setConfig(const ResolverConfig& v) { m_config = v; }
 
 
 
@@ -50,7 +47,8 @@ void Resolver::query(std::vector<std::shared_ptr<ldns_pkt>> pkts, MultiQueryCall
 	ctx->it = ctx->pkts.begin();
 	
 	auto sock = std::make_shared<asio::ip::tcp::socket>(m_service);
-	async_connect(*sock, m_endpoints.begin(), m_endpoints.end(), [=](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::iterator it) {
+	auto endpoints = m_config.endpoints();
+	async_connect(*sock, endpoints.begin(), endpoints.end(), [=](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::const_iterator it) {
 		if (err) {
 			cb(err, {});
 			return;

@@ -12,19 +12,35 @@
 using namespace libdane;
 using namespace libdane::net;
 
-std::vector<asio::ip::tcp::endpoint> ResolverConfig::loadResolvConf(const std::string &path)
+ResolverConfig::ResolverConfig()
+{
+	m_endpoints.emplace_back(asio::ip::address::from_string("2001:4860:4860::8888"), 53);
+	m_endpoints.emplace_back(asio::ip::address::from_string("2001:4860:4860::8844"), 53);
+	m_endpoints.emplace_back(asio::ip::address::from_string("8.8.8.8"), 53);
+	m_endpoints.emplace_back(asio::ip::address::from_string("8.8.4.4"), 53);
+}
+
+ResolverConfig::~ResolverConfig()
+{
+	
+}
+
+const std::vector<asio::ip::tcp::endpoint>& ResolverConfig::endpoints() const { return m_endpoints; }
+void ResolverConfig::setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v) { m_endpoints = v; }
+
+bool ResolverConfig::loadResolvConf(const std::string &path)
 {
 	std::fstream fs(path, std::ios::binary|std::ios::in);
 	if (!fs.is_open()) {
-		return {};
+		return false;
 	}
 	
 	std::stringstream ss;
 	ss << fs.rdbuf();
-	return ResolverConfig::parseResolvConf(ss.str());
+	return this->parseResolvConf(ss.str());
 }
 
-std::vector<asio::ip::tcp::endpoint> ResolverConfig::parseResolvConf(const std::string &str)
+bool ResolverConfig::parseResolvConf(const std::string &str)
 {
 	std::vector<asio::ip::tcp::endpoint> endpoints;
 	
@@ -38,5 +54,7 @@ std::vector<asio::ip::tcp::endpoint> ResolverConfig::parseResolvConf(const std::
 		}
 	}
 	
-	return endpoints;
+	m_endpoints = endpoints;
+	
+	return true;
 }

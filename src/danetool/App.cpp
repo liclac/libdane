@@ -32,7 +32,7 @@ int App::run(const std::vector<std::string> &args_)
 		return 1;
 	}
 	
-	daneres.setEndpoints(ResolverConfig::loadResolvConf());
+	daneres.config().loadResolvConf();
 	
 	// Look up the DANE record for the mail server on the domain
 	daneres.lookupDANE(args.domain, 25, TCP, [&](const asio::error_code &err, std::vector<DANERecord> records, bool dnssec) {

@@ -11,6 +11,7 @@
 #include "_internal/ldns.h"
 #include "../_internal/openssl.h"
 #include "common.h"
+#include "ResolverConfig.h"
 #include <asio.hpp>
 #include <deque>
 #include <memory>
@@ -68,14 +69,19 @@ namespace libdane
 			asio::io_service &service() const;
 			
 			/**
-			 * Returns a reference to the list of nameserver endpoints.
+			 * Returns a reference to the current config.
 			 */
-			const std::vector<asio::ip::tcp::endpoint>& endpoints() const;
+			const ResolverConfig& config() const;
 			
 			/**
-			 * Sets the list of nameserver endpoints.
+			 * Returns a reference to the current config.
 			 */
-			void setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v);
+			ResolverConfig& config();
+			
+			/**
+			 * Replaces the current config.
+			 */
+			void setConfig(const ResolverConfig& v);
 			
 			
 			/**
@@ -216,9 +222,9 @@ namespace libdane
 			asio::io_service &m_service;
 			
 			/**
-			 * A list of possible endpoints to connect to.
+			 * Current configuration.
 			 */
-			std::vector<asio::ip::tcp::endpoint> m_endpoints;
+			ResolverConfig m_config;
 		};
 	}
 }

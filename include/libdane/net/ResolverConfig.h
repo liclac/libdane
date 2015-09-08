@@ -31,25 +31,66 @@ namespace libdane
 		{
 		public:
 			/**
+			 * Creates a resolver config from the system's resolv.conf file.
+			 * 
+			 * @param  path Path to the file to parse
+			 * @return      A new resolver config
+			 */
+			inline static ResolverConfig fromResolvConf(const std::string &path = "/etc/resolv.conf") {
+				ResolverConfig conf;
+				conf.loadResolvConf(path);
+				return conf;
+			}
+			
+			
+			
+			/**
+			 * Initializes a resolver config with default values.
+			 */
+			ResolverConfig();
+			
+			/**
+			 * Destructor.
+			 */
+			virtual ~ResolverConfig();
+			
+			
+			
+			/**
+			 * Returns a reference to the list of nameserver endpoints.
+			 */
+			const std::vector<asio::ip::tcp::endpoint>& endpoints() const;
+			
+			/**
+			 * Replaces the current config.
+			 */
+			 void setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v);
+			
+			
+			
+			/**
 			 * Loads the system's resolv.conf file.
 			 * 
-			 * This is a blocking operation.
+			 * This is a blocking operation, and will replace current values.
 			 * 
 			 * @see parseResolvConf
 			 */
-			static std::vector<asio::ip::tcp::endpoint> loadResolvConf(const std::string &path = "/etc/resolv.conf");
+			bool loadResolvConf(const std::string &path = "/etc/resolv.conf");
 			
 			/**
 			 * Parses the contents of a resolv.conf file.
 			 * 
+			 * This will replace the currently stored values.
+			 * 
 			 * @see loadResolvConf
 			 */
-			static std::vector<asio::ip::tcp::endpoint> parseResolvConf(const std::string &str);
+			bool parseResolvConf(const std::string &str);
 			
-		private:
-			ResolverConfig() = delete;
-			ResolverConfig(const ResolverConfig &other) = delete;
-			virtual ~ResolverConfig() = 0;
+		protected:
+			/**
+			 * A list of possible endpoints to connect to.
+			 */
+			std::vector<asio::ip::tcp::endpoint> m_endpoints;
 		};
 	}
 }
