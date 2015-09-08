@@ -1,3 +1,10 @@
+/**
+ * internal/openssl.h
+ * libdane
+ * 
+ * Copyright 2015 uppfinnarn and Halon Security. All rights reserved.
+ */
+
 #ifndef LIBDANE_INTERNAL_OPENSSL_H
 #define LIBDANE_INTERNAL_OPENSSL_H
 
