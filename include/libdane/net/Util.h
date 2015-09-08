@@ -21,6 +21,7 @@ namespace libdane
 		 * 
 		 * @param  u    Usage
 		 * @param  sel  Selector
+		 * @param  mt   Matching type
 		 * @param  data Binary data
 		 * @return A new TLSA resource record
 		 */

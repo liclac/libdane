@@ -178,10 +178,16 @@ namespace libdane
 			std::shared_ptr<ldns_pkt> unwire(const std::vector<unsigned char> &wire);
 			
 		protected:
+			/**
+			 * Connection context structure.
+			 */
 			struct ConnectionContext {
+				/// Transfer buffer
 				std::vector<unsigned char> buffer;
 				
+				/// Packets to send
 				std::vector<std::shared_ptr<ldns_pkt>> pkts;
+				/// Iterator to the current packet
 				std::vector<std::shared_ptr<ldns_pkt>>::iterator it;
 			};
 			

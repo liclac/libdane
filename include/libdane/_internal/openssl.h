@@ -31,9 +31,19 @@ namespace libdane
 	{
 		namespace initializers
 		{
+			/**
+			 * Initializes OpenSSL.
+			 * 
+			 * To prevent this from happening, define `LIBDANE_NO_INIT_OPENSSL`
+			 * prior to including any libdane files - possibly in a prefix
+			 * header or a compiler flag.
+			 */
 			class openssl
 			{
 			public:
+				/**
+				 * Initializes the OpenSSL library.
+				 */
 				openssl()
 				{
 					::SSL_library_init();
@@ -42,6 +52,7 @@ namespace libdane
 				}
 			};
 			
+			/// Static initializer object
 			static openssl _init_openssl;
 		}
 	}
