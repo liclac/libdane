@@ -173,7 +173,7 @@ namespace libdane
 			 * @param  tcp Format for TCP (with a length prefix)
 			 * @return The packet in binary wire format
 			 */
-			std::vector<unsigned char> wire(std::shared_ptr<ldns_pkt> pkt, bool tcp = true);
+			std::vector<unsigned char> wire(std::shared_ptr<ldns_pkt> pkt, bool tcp);
 			
 			/**
 			 * Decodes a DNS packet from wire format.

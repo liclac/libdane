@@ -192,7 +192,7 @@ void Resolver::sendQuery(std::shared_ptr<asio::ip::tcp::socket> sock, std::vecto
 
 void Resolver::sendQueryChain(std::shared_ptr<asio::ip::tcp::socket> sock, std::shared_ptr<ConnectionContext> ctx, MultiQueryCallback cb)
 {
-	ctx->buffer = this->wire(*ctx->it);
+	ctx->buffer = this->wire(*ctx->it, true);
 	this->sendQuery(sock, ctx->buffer, [=](const asio::error_code &err) mutable {
 		if (err) {
 			cb(err, {});
