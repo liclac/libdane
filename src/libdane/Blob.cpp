@@ -10,6 +10,8 @@
 #include <memory>
 #include <sstream>
 #include <iomanip>
+#include <cstring>
+#include <stdexcept>
 
 using namespace libdane;
 

@@ -12,6 +12,7 @@
 #include "Blob.h"
 #include "common.h"
 #include <deque>
+#include <string>
 
 namespace libdane
 {

@@ -11,6 +11,8 @@
 #include "_internal/openssl.h"
 #include "common.h"
 #include <vector>
+#include <string>
+#include <ostream>
 
 namespace libdane
 {
