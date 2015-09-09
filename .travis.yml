@@ -2,7 +2,9 @@ language: cpp
 compiler:
 # - clang
   - gcc
-cache: ccache
+cache:
+  directories:
+    - $HOME/cmake
 addons:
   apt:
     sources:
@@ -15,7 +17,8 @@ install:
   - 'export CC=gcc-4.8'
   - 'export CXX=g++-4.8'
   - 'mkdir $HOME/prefix'
-  - 'cd $HOME && git clone git://cmake.org/cmake.git --branch v3.3.1 --single-branch --depth 1 && cd cmake && ./bootstrap --prefix=$HOME/prefix --enable-ccache --parallel=4 && make -j4 && make install'
+  - '[ -d $HOME/cmake ] || cd $HOME && git clone git://cmake.org/cmake.git --branch v3.3.1 --single-branch --depth 1 && cd cmake && ./bootstrap --prefix=$HOME/prefix --parallel=4'
+  - 'cd $HOME/cmake && make -j4 && make install'
 script:
   - 'cd $TRAVIS_BUILD_DIR'
   - 'mkdir build && cd build'
