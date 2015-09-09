@@ -7,6 +7,7 @@
 
 #include <catch.hpp>
 #include <libdane/Blob.h>
+#include <stdexcept>
 
 using namespace libdane;
 

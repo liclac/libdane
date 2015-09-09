@@ -12,6 +12,7 @@
 #include <memory>
 #include <functional>
 #include <algorithm>
+#include <stdexcept>
 
 using namespace libdane;
 using namespace std::placeholders;

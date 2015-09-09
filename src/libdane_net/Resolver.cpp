@@ -11,6 +11,7 @@
 #include <libdane/net/Util.h>
 #include <memory>
 #include <vector>
+#include <stdexcept>
 
 using namespace libdane;
 using namespace libdane::net;

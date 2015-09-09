@@ -7,6 +7,7 @@
 
 #include <libdane/Certificate.h>
 #include <regex>
+#include <stdexcept>
 
 using namespace libdane;
 
