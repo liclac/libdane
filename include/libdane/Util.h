@@ -13,6 +13,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iterator>
+#include <memory>
 
 namespace libdane
 {
