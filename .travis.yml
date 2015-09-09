@@ -2,11 +2,12 @@ language: cpp
 compiler:
   - clang
   - gcc
+cache: ccache
 addons:
   apt:
     packages:
     - openssl
 install:
   - 'mkdir prefix'
-  - 'git clone git://cmake.org/cmake.git --branch v3.3.1 --single-branch --depth 1 && cd cmake && ./bootstrap --prefix=../prefix && make && make install; cd ..'
+  - 'git clone git://cmake.org/cmake.git --branch v3.3.1 --single-branch --depth 1 && cd cmake && ./bootstrap --prefix=../prefix --enable-ccache && make && make install; cd ..'
 script: 'PATH=prefix/bin:$PATH cmake . && make && make check'
