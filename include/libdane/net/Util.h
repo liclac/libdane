@@ -11,6 +11,7 @@
 #include "common.h"
 #include "_internal/ldns.h"
 #include "../DANERecord.h"
+#include <memory>
 
 namespace libdane
 {
