@@ -16,4 +16,4 @@ install:
   - '[[ $CC == gcc ]] && export CXX=gcc-4.8'
   - 'mkdir $HOME/prefix'
   - 'cd $HOME && git clone git://cmake.org/cmake.git --branch v3.3.1 --single-branch --depth 1 && cd cmake && ./bootstrap --prefix=$HOME/prefix --enable-ccache --parallel=4 && make -j4 && make install'
-script: 'PATH=$HOME/prefix/bin:$PATH cmake . && make -j4 && make check'
+script: 'PATH=$HOME/prefix/bin:$PATH cmake . && make && make check'
