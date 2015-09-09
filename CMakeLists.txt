@@ -10,6 +10,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include(${CMAKE_SOURCE_DIR}/vendor/includes.cmake)
 include_directories(include)
 
+# Use ASIO standalone, with no dependency on Boost
+add_definitions(-DASIO_STANDALONE)
+
 add_subdirectory(vendor)
 add_subdirectory(src)
 
