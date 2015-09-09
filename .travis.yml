@@ -7,6 +7,7 @@ addons:
   apt:
     packages:
     - openssl
+    - gcc
 install:
   - 'mkdir prefix'
   - 'git clone git://cmake.org/cmake.git --branch v3.3.1 --single-branch --depth 1 && cd cmake && ./bootstrap --prefix=../prefix --enable-ccache --parallel=4 && make -j4 && make install; cd ..'
