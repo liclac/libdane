@@ -17,7 +17,7 @@ install:
   - 'export CC=gcc-4.8'
   - 'export CXX=g++-4.8'
   - 'mkdir $HOME/prefix'
-  - '[ -d $HOME/cmake ] || cd $HOME && git clone git://cmake.org/cmake.git --branch v3.3.1 --single-branch --depth 1 && cd $HOME/cmake && ./bootstrap --prefix=$HOME/prefix --parallel=4 && echo $PWD'
+  - '[ -d $HOME/cmake ] || { git clone git://cmake.org/cmake.git --branch v3.3.1 --single-branch --depth 1 $HOME/cmake && $HOME/cmake/bootstrap --prefix=$HOME/prefix --parallel=4 }'
   - 'cd $HOME/cmake && echo $PWD && make -j4 && make install'
 script:
   - 'cd $TRAVIS_BUILD_DIR'
