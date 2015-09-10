@@ -55,6 +55,18 @@ namespace libdane
 	}
 	
 	/**
+	 * Converts a sequence into a hexadecimal string.
+	 * 
+	 * @tparam T    Type to cast values through
+	 * @param  data Data container
+	 */
+	template<typename T = unsigned char, typename ContainerT>
+	inline std::string to_hex(const ContainerT &data)
+	{
+		return to_hex<T>(data.begin(), data.end());
+	}
+	
+	/**
 	 * Decodes a hexadecimal string.
 	 * 
 	 * @tparam T     Type to cast values through
@@ -177,6 +189,21 @@ namespace libdane
 		std::vector<T> vec;
 		hash(type, std::back_inserter(vec), begin, end);
 		return vec;
+	}
+	
+	/**
+	 * Calculates a hash of the given data.
+	 * 
+	 * This is a convenience overload for one-line hash calculations.
+	 * 
+	 * @tparam T Value type for the container
+	 * @param type Type of hash to calculate
+	 * @param vec Vector of data to hash
+	 */
+	template<typename T = unsigned char>
+	inline std::vector<T> hash(const EVP_MD *type, const std::vector<T> &vec)
+	{
+		return hash(type, vec.begin(), vec.end());
 	}
 	
 	/**

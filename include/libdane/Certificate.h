@@ -9,8 +9,8 @@
 #define LIBDANE_CERTIFICATE_H
 
 #include "_internal/openssl.h"
-#include "Blob.h"
 #include "common.h"
+#include <vector>
 #include <deque>
 #include <string>
 
@@ -79,12 +79,12 @@ namespace libdane
 		/**
 		 * Returns the certificate's public key.
 		 */
-		Blob publicKey() const;
+		std::vector<unsigned char> publicKey() const;
 		
 		/**
 		 * Returns the DER representation of the certificate.
 		 */
-		Blob encoded() const;
+		std::vector<unsigned char> encoded() const;
 		
 		/**
 		 * Returns the data matching the given selector.
@@ -92,7 +92,7 @@ namespace libdane
 		 * @see Certificate::publicKey()
 		 * @see Certificate::data()
 		 */
-		Blob select(Selector sel) const;
+		std::vector<unsigned char> select(Selector sel) const;
 		
 		/**
 		 * Verifies that the certificate was issued by another one.

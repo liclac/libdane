@@ -7,7 +7,7 @@
 
 #include <catch.hpp>
 #include <libdane/net/Resolver.h>
-#include <libdane/Blob.h>
+#include <libdane/Util.h>
 #include <algorithm>
 
 using namespace libdane;
@@ -68,7 +68,7 @@ SCENARIO("Wire encoding works")
 			
 			THEN("The checksum should be correct")
 			{
-				REQUIRE(Blob(udp).sha256().hex() == "cc43d1338bffcc384219754b99618efa4cec609b32776d6d0b8c9fdf9aa69001");
+				REQUIRE(to_hex(hash(EVP_sha256(), udp)) == "cc43d1338bffcc384219754b99618efa4cec609b32776d6d0b8c9fdf9aa69001");
 			}
 			
 			THEN("Encoded for TCP")

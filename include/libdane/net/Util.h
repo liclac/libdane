@@ -26,7 +26,7 @@ namespace libdane
 		 * @param  data Binary data
 		 * @return A new TLSA resource record
 		 */
-		std::shared_ptr<ldns_rr> make_tlsa(Usage u, Selector sel, MatchingType mt, const Blob &data);
+		std::shared_ptr<ldns_rr> make_tlsa(Usage u, Selector sel, MatchingType mt, const std::vector<unsigned char> &data);
 		
 		/**
 		 * Builds a TLSA record from a libdane::DANERecord.

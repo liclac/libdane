@@ -12,7 +12,7 @@
 using namespace libdane;
 using namespace libdane::net;
 
-std::shared_ptr<ldns_rr> libdane::net::make_tlsa(Usage u, Selector sel, MatchingType mt, const Blob &data)
+std::shared_ptr<ldns_rr> libdane::net::make_tlsa(Usage u, Selector sel, MatchingType mt, const std::vector<unsigned char> &data)
 {
 	uint8_t u8 = u;
 	uint8_t sel8 = sel;
@@ -24,7 +24,7 @@ std::shared_ptr<ldns_rr> libdane::net::make_tlsa(Usage u, Selector sel, Matching
 	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_INT8, sizeof(u8), &u8));
 	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_INT8, sizeof(sel8), &sel8));
 	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_INT8, sizeof(mt8), &mt8));
-	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_HEX, data.data().size(), data.data().data()));
+	ldns_rr_push_rdf(&*rr, ldns_rdf_new_frm_data(LDNS_RDF_TYPE_HEX, data.size(), data.data()));
 	
 	return rr;
 }

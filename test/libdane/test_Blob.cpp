@@ -6,12 +6,12 @@
  */
 
 #include <catch.hpp>
-#include <libdane/Blob.h>
+// #include <libdane/Blob.h>
 #include <stdexcept>
 
-using namespace libdane;
+// using namespace libdane;
 
-SCENARIO("Formatting of binary data works")
+/*SCENARIO("Formatting of binary data works")
 {
 	GIVEN("0x1337")
 	{
@@ -99,4 +99,4 @@ SCENARIO("Hashing works")
 			CHECK_THROWS_AS(blob.match(static_cast<MatchingType>(255)), std::runtime_error);
 		}
 	}
-}
+}*/

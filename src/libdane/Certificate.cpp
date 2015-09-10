@@ -75,36 +75,36 @@ std::string Certificate::issuerDN() const
 	return this->nameStr(X509_get_issuer_name(m_x509));
 }
 
-Blob Certificate::publicKey() const
+std::vector<unsigned char> Certificate::publicKey() const
 {
 	if (!m_x509) {
-		return Blob();
+		return std::vector<unsigned char>();
 	}
 	
 	unsigned char *buf = NULL;
 	EVP_PKEY *pkey = X509_get_pubkey(m_x509);
 	int size = i2d_PUBKEY(pkey, &buf);
-	Blob blob(buf, size);
+	std::vector<unsigned char> data(buf, buf + size);
 	free(buf);
 	
-	return blob;
+	return data;
 }
 
-Blob Certificate::encoded() const
+std::vector<unsigned char> Certificate::encoded() const
 {
 	if (!m_x509) {
-		return Blob();
+		return std::vector<unsigned char>();
 	}
 	
 	unsigned char *buf = NULL;
 	int size = i2d_X509(m_x509, &buf);
-	Blob blob(buf, size);
+	std::vector<unsigned char> data(buf, buf + size);
 	free(buf);
 	
-	return blob;
+	return data;
 }
 
-Blob Certificate::select(Selector sel) const
+std::vector<unsigned char> Certificate::select(Selector sel) const
 {
 	switch (sel) {
 		case FullCertificate:

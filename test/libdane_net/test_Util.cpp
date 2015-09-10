@@ -7,6 +7,7 @@
 
 #include <catch.hpp>
 #include <libdane/net/Util.h>
+#include <libdane/Util.h>
 
 using namespace libdane;
 using namespace libdane::net;
@@ -15,7 +16,7 @@ SCENARIO("TLSA RRs can be created")
 {
 	GIVEN("A set of parameters")
 	{
-		std::shared_ptr<ldns_rr> rr = make_tlsa(CAConstraints, FullCertificate, SHA256Hash, Blob({ 0xFE, 0xEF }));
+		std::shared_ptr<ldns_rr> rr = make_tlsa(CAConstraints, FullCertificate, SHA256Hash, { 0xFE, 0xEF });
 		
 		THEN("The rdf count should be correct")
 		{
@@ -63,25 +64,25 @@ SCENARIO("Records can be parsed from TLSA RRs")
 	{
 		GIVEN("CAConstraints")
 		{
-			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, SHA256Hash, Blob({ 0xFE })));
+			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, SHA256Hash, { 0xFE }));
 			REQUIRE(rec.usage() == CAConstraints);
 		}
 		
 		GIVEN("ServiceCertificateConstraint")
 		{
-			DANERecord rec = record_from_tlsa(make_tlsa(ServiceCertificateConstraint, FullCertificate, SHA256Hash, Blob({ 0xFE })));
+			DANERecord rec = record_from_tlsa(make_tlsa(ServiceCertificateConstraint, FullCertificate, SHA256Hash, { 0xFE }));
 			REQUIRE(rec.usage() == ServiceCertificateConstraint);
 		}
 		
 		GIVEN("TrustAnchorAssertion")
 		{
-			DANERecord rec = record_from_tlsa(make_tlsa(TrustAnchorAssertion, FullCertificate, SHA256Hash, Blob({ 0xFE })));
+			DANERecord rec = record_from_tlsa(make_tlsa(TrustAnchorAssertion, FullCertificate, SHA256Hash, { 0xFE }));
 			REQUIRE(rec.usage() == TrustAnchorAssertion);
 		}
 		
 		GIVEN("DomainIssuedCertificate")
 		{
-			DANERecord rec = record_from_tlsa(make_tlsa(DomainIssuedCertificate, FullCertificate, SHA256Hash, Blob({ 0xFE })));
+			DANERecord rec = record_from_tlsa(make_tlsa(DomainIssuedCertificate, FullCertificate, SHA256Hash, { 0xFE }));
 			REQUIRE(rec.usage() == DomainIssuedCertificate);
 		}
 	}
@@ -90,13 +91,13 @@ SCENARIO("Records can be parsed from TLSA RRs")
 	{
 		GIVEN("FullCertificate")
 		{
-			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, SHA256Hash, Blob({ 0xFE })));
+			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, SHA256Hash, { 0xFE }));
 			REQUIRE(rec.selector() == FullCertificate);
 		}
 		
 		GIVEN("SubjectPublicKeyInfo")
 		{
-			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, SubjectPublicKeyInfo, SHA256Hash, Blob({ 0xFE })));
+			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, SubjectPublicKeyInfo, SHA256Hash, { 0xFE }));
 			REQUIRE(rec.selector() == SubjectPublicKeyInfo);
 		}
 	}
@@ -105,26 +106,26 @@ SCENARIO("Records can be parsed from TLSA RRs")
 	{
 		GIVEN("ExactMatch")
 		{
-			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, ExactMatch, Blob({ 0xFE })));
+			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, ExactMatch, { 0xFE }));
 			REQUIRE(rec.matching() == ExactMatch);
 		}
 		
 		GIVEN("SHA256Hash")
 		{
-			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, SHA256Hash, Blob({ 0xFE })));
+			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, SHA256Hash, { 0xFE }));
 			REQUIRE(rec.matching() == SHA256Hash);
 		}
 		
 		GIVEN("SHA512Hash")
 		{
-			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, SHA512Hash, Blob({ 0xFE })));
+			DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, SHA512Hash, { 0xFE }));
 			REQUIRE(rec.matching() == SHA512Hash);
 		}
 	}
 	
 	GIVEN("Some binary data")
 	{
-		DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, SHA512Hash, Blob({ 0xFE })));
-		REQUIRE(rec.data().hex() == "fe");
+		DANERecord rec = record_from_tlsa(make_tlsa(CAConstraints, FullCertificate, SHA512Hash, { 0xFE }));
+		REQUIRE(to_hex(rec.data()) == "fe");
 	}
 }

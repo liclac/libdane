@@ -7,6 +7,7 @@
 
 #include <catch.hpp>
 #include <libdane/Certificate.h>
+#include <libdane/Util.h>
 #include "../resources.h"
 
 using namespace libdane;
@@ -30,8 +31,8 @@ SCENARIO("Accessors work")
 		
 		THEN("Data blobs should be correct")
 		{
-			CHECK(cert.encoded().sha256().hex() == "440e875366ad14f997127cb7199dd255fc01fb1c57a7adde9415dca228535404");
-			CHECK(cert.publicKey().sha256().hex() == "7b1394143f8d123760572cc410d1441b3bea3aaf987d0e4b950749e72d554db9");
+			CHECK(to_hex(hash(EVP_sha256(), cert.encoded())) == "440e875366ad14f997127cb7199dd255fc01fb1c57a7adde9415dca228535404");
+			CHECK(to_hex(hash(EVP_sha256(), cert.publicKey())) == "7b1394143f8d123760572cc410d1441b3bea3aaf987d0e4b950749e72d554db9");
 		}
 		
 		THEN("Selection should return the correct blob")

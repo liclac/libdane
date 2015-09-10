@@ -6,6 +6,7 @@
  */
 
 #include <libdane/DANERecord.h>
+#include <libdane/Util.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -22,14 +23,18 @@ DANERecord::DANERecord()
 	
 }
 
-DANERecord::DANERecord(Usage usage, Selector selector, MatchingType matching, Blob data):
+DANERecord::DANERecord(Usage usage, Selector selector, MatchingType matching, std::vector<unsigned char> data):
 	m_usage(usage), m_selector(selector), m_matching(matching), m_data(data)
 {
 	
 }
 
 DANERecord::DANERecord(Usage usage, Selector selector, MatchingType matching, const Certificate &cert):
-	DANERecord(usage, selector, matching, cert.select(selector).match(matching)) {}
+	DANERecord(usage, selector, matching, std::vector<unsigned char>())
+{
+	std::vector<unsigned char> selection = cert.select(m_selector);
+	match(m_matching, std::back_inserter(m_data), selection.begin(), selection.end());
+}
 
 DANERecord::~DANERecord()
 {
@@ -78,7 +83,8 @@ bool DANERecord::verify(bool preverified, const Certificate &cert, const std::de
 
 bool DANERecord::verify(const Certificate &cert) const
 {
-	return cert.select(m_selector).match(m_matching) == m_data;
+	std::vector<unsigned char> selection = cert.select(m_selector);
+	return match(m_matching, selection.begin(), selection.end()) == m_data;
 }
 
 std::string DANERecord::toString() const
@@ -128,7 +134,7 @@ std::string DANERecord::toString() const
 			break;
 	}
 	
-	ss << ", \"" << m_data.hex() << "\")";
+	ss << ", \"" << to_hex(m_data.begin(), m_data.end()) << "\")";
 	
 	return ss.str();
 }
@@ -144,8 +150,8 @@ void DANERecord::setSelector(Selector v) { m_selector = v; }
 MatchingType DANERecord::matching() const { return m_matching; }
 void DANERecord::setMatching(MatchingType v) { m_matching = v; }
 
-Blob DANERecord::data() const { return m_data; }
-void DANERecord::setData(Blob v) { m_data = v; }
+std::vector<unsigned char> DANERecord::data() const { return m_data; }
+void DANERecord::setData(std::vector<unsigned char> v) { m_data = v; }
 
 
 

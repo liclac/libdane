@@ -12,7 +12,6 @@
 #include <vector>
 #include "_internal/openssl.h"
 #include "VerifyContext.h"
-#include "Blob.h"
 #include "common.h"
 
 namespace libdane
@@ -31,7 +30,7 @@ namespace libdane
 		/**
 		 * Constructs a DANE record with the given values.
 		 */
-		DANERecord(Usage usage, Selector selector, MatchingType matching, Blob data);
+		DANERecord(Usage usage, Selector selector, MatchingType matching, std::vector<unsigned char> data);
 		
 		/**
 		 * Constructs a DANE record matching the given certificate.
@@ -85,17 +84,17 @@ namespace libdane
 		
 		
 		
-		Usage usage() const;				///< Certificate Usage
-		void setUsage(Usage v);				///< Sets usage()
+		Usage usage() const;							///< Certificate Usage
+		void setUsage(Usage v);							///< Sets usage()
 		
-		Selector selector() const;			///< Selector
-		void setSelector(Selector v);		///< Sets selector()
+		Selector selector() const;						///< Selector
+		void setSelector(Selector v);					///< Sets selector()
 		
-		MatchingType matching() const;		///< Matching Type
-		void setMatching(MatchingType v);	///< Sets matching()
+		MatchingType matching() const;					///< Matching Type
+		void setMatching(MatchingType v);				///< Sets matching()
 		
-		Blob data() const;					///< Binary data
-		void setData(Blob v);				///< Sets data()
+		std::vector<unsigned char> data() const;		///< Binary data
+		void setData(std::vector<unsigned char> v);		///< Sets data()
 		
 	protected:
 		/// Implementation for verify() with DANERecord::CAConstraints
@@ -114,7 +113,7 @@ namespace libdane
 		Usage m_usage;
 		Selector m_selector;
 		MatchingType m_matching;
-		Blob m_data;
+		std::vector<unsigned char> m_data;
 	};
 }
 
