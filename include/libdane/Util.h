@@ -171,7 +171,7 @@ namespace libdane
 	inline std::vector<T> hash(const EVP_MD *type, IterT begin, IterT end)
 	{
 		std::vector<T> vec;
-		hash(type, vec.begin(), begin, end);
+		hash(type, std::back_inserter(vec), begin, end);
 		return vec;
 	}
 	
