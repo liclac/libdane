@@ -176,6 +176,27 @@ namespace libdane
 	}
 	
 	/**
+	 * Returns an EVP_MD from the given matching type.
+	 * 
+	 * @param  type Matching type
+	 * @return      An EVP_MD, or nullptr for ExactMatch
+	 * @throws      std::runtime_error for an invalid type
+	 */
+	inline const EVP_MD *md_from_matching_type(MatchingType type)
+	{
+		switch (type) {
+			case ExactMatch:
+				return nullptr;
+			case SHA256Hash:
+				return EVP_sha256();
+			case SHA512Hash:
+				return EVP_sha512();
+			default:
+				throw std::runtime_error("Unknown MatchingType");
+		}
+	}
+	
+	/**
 	 * Matches data using a MatchingType.
 	 * 
 	 * @param type Matching type
@@ -186,15 +207,11 @@ namespace libdane
 	template<typename IterT, typename OutputIt>
 	OutputIt match(MatchingType type, OutputIt first, IterT begin, IterT end)
 	{
-		switch (type) {
-			case ExactMatch:
-				return std::copy(begin, end, first);
-			case SHA256Hash:
-				return hash(EVP_sha256(), first, begin, end);
-			case SHA512Hash:
-				return hash(EVP_sha512(), first, begin, end);
-			default:
-				throw std::runtime_error("Unknown MatchingType");
+		const EVP_MD *md = md_from_matching_type(type);
+		if (md == nullptr) {
+			return hash(md, first, begin, end);
+		} else {
+			return std::copy(begin, end, first);
 		}
 	}
 	
