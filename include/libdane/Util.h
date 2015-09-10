@@ -331,15 +331,15 @@ namespace libdane
 	}
 	
 	/**
-	 * Decodes a hexadecimal string.
+	 * Matches data using a MatchingType.
 	 * 
-	 * This is a convenience function for decoding a string straight into a
-	 * newly constructed container.
+	 * This is a convenience overload to allow one-line matching.
 	 * 
-	 * @tparam T Type to cast values through
+	 * @tparam T Value type for the container
 	 * @tparam CharT Underlying character type
-	 * @param str String to decode
-	 * @return A new vector with the decoded data
+	 * @param type Matching type
+	 * @param str String to match
+	 * @throws std::runtime_error for an invalid type
 	 */
 	template<typename T = unsigned char, typename CharT>
 	inline std::vector<T> match(MatchingType type, const std::basic_string<CharT> &str)
@@ -348,15 +348,15 @@ namespace libdane
 	}
 	
 	/**
-	 * Decodes a hexadecimal string.
+	 * Matches data using a MatchingType.
 	 * 
-	 * This is a convenience function for decoding a string straight into a
-	 * newly constructed container.
+	 * This is a convenience overload to allow one-line matching.
 	 * 
-	 * @tparam T Type to cast values through
+	 * @tparam T Value type for the container
 	 * @tparam CharT Underlying character type
-	 * @param str String to decode
-	 * @return A new ContainerT with the decoded data
+	 * @param type Matching type
+	 * @param str String to match
+	 * @throws std::runtime_error for an invalid type
 	 */
 	template<typename T = unsigned char, typename CharT>
 	inline std::vector<T> match(MatchingType type, const CharT *str)
