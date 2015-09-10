@@ -117,7 +117,7 @@ namespace libdane
 	 * @param end Iterator to the end of the data
 	 */
 	template<typename T, typename OutputIt>
-	OutputIt hash(const EVP_MD *type, OutputIt first, typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end)
+	inline OutputIt hash(const EVP_MD *type, OutputIt first, typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end)
 	{
 		auto ctx = std::shared_ptr<EVP_MD_CTX>(EVP_MD_CTX_create(), EVP_MD_CTX_destroy);
 		
@@ -150,7 +150,7 @@ namespace libdane
 	 * @param end Iterator to the end of the data
 	 */
 	template<typename IterT, typename OutputIt>
-	OutputIt hash(const EVP_MD *type, OutputIt first, IterT begin, IterT end)
+	inline OutputIt hash(const EVP_MD *type, OutputIt first, IterT begin, IterT end)
 	{
 		typedef typename IterT::value_type T;
 		std::vector<T> vec(begin, end);
@@ -168,7 +168,7 @@ namespace libdane
 	 * @param end Iterator to the end of the data
 	 */
 	template<typename T = unsigned char, typename IterT>
-	std::vector<T> hash(const EVP_MD *type, IterT begin, IterT end)
+	inline std::vector<T> hash(const EVP_MD *type, IterT begin, IterT end)
 	{
 		std::vector<T> vec;
 		hash(type, vec.begin(), begin, end);
@@ -205,7 +205,7 @@ namespace libdane
 	 * @param end Iterator to the end of the data
 	 */
 	template<typename IterT, typename OutputIt>
-	OutputIt match(MatchingType type, OutputIt first, IterT begin, IterT end)
+	inline OutputIt match(MatchingType type, OutputIt first, IterT begin, IterT end)
 	{
 		const EVP_MD *md = md_from_matching_type(type);
 		if (md == nullptr) {
@@ -226,7 +226,7 @@ namespace libdane
 	 * @param end Iterator to the end of the data
 	 */
 	template<typename T = unsigned char, typename IterT>
-	std::vector<T> match(MatchingType type, IterT begin, IterT end)
+	inline std::vector<T> match(MatchingType type, IterT begin, IterT end)
 	{
 		std::vector<T> vec;
 		match(type, std::back_inserter(vec), begin, end);
