@@ -14,6 +14,8 @@
 #include <iomanip>
 #include <iterator>
 #include <memory>
+#include <algorithm>
+#include <stdexcept>
 
 namespace libdane
 {
@@ -101,6 +103,121 @@ namespace libdane
 		container.reserve(std::distance(begin, end) / 2);
 		from_hex<T>(std::back_inserter(container), begin, end);
 		return container;
+	}
+	
+	/**
+	 * Calculates a hash of the given data.
+	 * 
+	 * This is the most efficient, but possibly least convenient overload to
+	 * use.
+	 * 
+	 * @param type Type of hash to calculate
+	 * @param first An insert iterator in a container
+	 * @param begin Iterator to the start of the data
+	 * @param end Iterator to the end of the data
+	 */
+	template<typename T, typename OutputIt>
+	OutputIt hash(const EVP_MD *type, OutputIt first, typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end)
+	{
+		auto ctx = std::shared_ptr<EVP_MD_CTX>(EVP_MD_CTX_create(), EVP_MD_CTX_destroy);
+		
+		if (!EVP_DigestInit(&*ctx, type)) {
+			throw std::runtime_error("Failed to initialize a hash context");
+		}
+		
+		if (!EVP_DigestUpdate(&*ctx, &*begin, std::distance(begin, end))) {
+			throw std::runtime_error("Failed to feed data to the hash context; out of memory?");
+		}
+		
+		unsigned char buf[EVP_MAX_MD_SIZE];
+		unsigned int len;
+		if (!EVP_DigestFinal(&*ctx, buf, &len)) {
+			throw std::runtime_error("Failed to finalize the hash");
+		}
+		
+		for (auto it = buf; it < buf + len; it++) {
+			*first++ = *it;
+		}
+		
+		return first;
+	}
+	
+	/**
+	 * Calculates a hash of the given data.
+	 * 
+	 * This overload allows non-contigious iterators, by copying the data into
+	 * a contigious container before use.
+	 * 
+	 * @param type Type of hash to calculate
+	 * @param first An insert iterator in a container
+	 * @param begin Iterator to the start of the data
+	 * @param end Iterator to the end of the data
+	 */
+	template<typename IterT, typename OutputIt>
+	OutputIt hash(const EVP_MD *type, OutputIt first, IterT begin, IterT end)
+	{
+		typedef typename IterT::value_type T;
+		std::vector<T> vec(begin, end);
+		return hash<T>(type, first, vec.begin(), vec.end());
+	}
+	
+	/**
+	 * Calculates a hash of the given data.
+	 * 
+	 * This is a convenience overload for one-line hash calculations.
+	 * 
+	 * @tparam T Value type for the container
+	 * @param type Type of hash to calculate
+	 * @param begin Iterator to the start of the data
+	 * @param end Iterator to the end of the data
+	 */
+	template<typename T = unsigned char, typename IterT>
+	std::vector<T> hash(const EVP_MD *type, IterT begin, IterT end)
+	{
+		std::vector<T> vec;
+		hash(type, vec.begin(), begin, end);
+		return vec;
+	}
+	
+	/**
+	 * Matches data using a MatchingType.
+	 * 
+	 * @param type Matching type
+	 * @param first An insert iterator into a container
+	 * @param begin Iterator to the start of the data
+	 * @param end Iterator to the end of the data
+	 */
+	template<typename IterT, typename OutputIt>
+	OutputIt match(MatchingType type, OutputIt first, IterT begin, IterT end)
+	{
+		switch (type) {
+			case ExactMatch:
+				return std::copy(begin, end, first);
+			case SHA256Hash:
+				return hash(EVP_sha256(), first, begin, end);
+			case SHA512Hash:
+				return hash(EVP_sha512(), first, begin, end);
+			default:
+				throw std::runtime_error("Unknown MatchingType");
+		}
+	}
+	
+	/**
+	 * Matches data using a MatchingType.
+	 * 
+	 * This is a convenience overload to allow one-line matching.
+	 * 
+	 * @tparam T Value type for the container
+	 * @param type Matching type
+	 * @param begin Iterator to the start of the data
+	 * @param end Iterator to the end of the data
+	 */
+	template<typename T = unsigned char, typename IterT>
+	std::vector<T> match(MatchingType type, IterT begin, IterT end)
+	{
+		std::vector<T> vec;
+		match(type, std::back_inserter(vec), begin, end);
+		return vec;
 	}
 }
 
