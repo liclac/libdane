@@ -119,6 +119,10 @@ namespace libdane
 	template<typename T, typename OutputIt>
 	inline OutputIt hash(const EVP_MD *type, OutputIt first, typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end)
 	{
+		if (type == nullptr) {
+			return std::copy(begin, end, first);
+		}
+		
 		auto ctx = std::shared_ptr<EVP_MD_CTX>(EVP_MD_CTX_create(), EVP_MD_CTX_destroy);
 		
 		if (!EVP_DigestInit(&*ctx, type)) {
@@ -208,11 +212,7 @@ namespace libdane
 	inline OutputIt match(MatchingType type, OutputIt first, IterT begin, IterT end)
 	{
 		const EVP_MD *md = md_from_matching_type(type);
-		if (md == nullptr) {
-			return hash(md, first, begin, end);
-		} else {
-			return std::copy(begin, end, first);
-		}
+		return hash(md, first, begin, end);
 	}
 	
 	/**
