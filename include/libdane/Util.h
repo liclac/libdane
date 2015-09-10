@@ -135,11 +135,7 @@ namespace libdane
 			throw std::runtime_error("Failed to finalize the hash");
 		}
 		
-		for (auto it = buf; it < buf + len; it++) {
-			*first++ = *it;
-		}
-		
-		return first;
+		return std::copy(buf, buf + len, first);
 	}
 	
 	/**
