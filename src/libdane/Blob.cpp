@@ -84,23 +84,7 @@ std::string Blob::hex() const
 
 Blob Blob::hash(const EVP_MD *type) const
 {
-	auto ctx = std::shared_ptr<EVP_MD_CTX>(EVP_MD_CTX_create(), EVP_MD_CTX_destroy);
-	
-	if (!EVP_DigestInit(&*ctx, type)) {
-		throw std::runtime_error("Failed to initialize a hash context");
-	}
-	
-	if (!EVP_DigestUpdate(&*ctx, m_data.data(), m_data.size())) {
-		throw std::runtime_error("Failed to feed data to the hash context; out of memory?");
-	}
-	
-	unsigned char buf[EVP_MAX_MD_SIZE];
-	unsigned int len;
-	if (!EVP_DigestFinal(&*ctx, buf, &len)) {
-		throw std::runtime_error("Failed to finalize the hash");
-	}
-	
-	return Blob(buf, len);
+	return libdane::hash(type, m_data.begin(), m_data.end());
 }
 
 std::ostream& libdane::operator<<(std::ostream& stream, const Blob &blob)
