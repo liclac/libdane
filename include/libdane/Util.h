@@ -125,6 +125,7 @@ namespace libdane
 	 * 
 	 * @tparam T Type to cast values through
 	 * @tparam ContainerT Container type to fill up
+	 * @tparam CharT Underlying character type
 	 * @param str String to decode
 	 * @return A new ContainerT with the decoded data
 	 */
@@ -134,6 +135,18 @@ namespace libdane
 		return from_hex<T>(str.begin(), str.end());
 	}
 	
+	/**
+	 * Decodes a hexadecimal string.
+	 * 
+	 * This is a convenience function for decoding a string straight into a
+	 * newly constructed container.
+	 * 
+	 * @tparam T Type to cast values through
+	 * @tparam ContainerT Container type to fill up
+	 * @tparam CharT Underlying character type
+	 * @param str String to decode
+	 * @return A new ContainerT with the decoded data
+	 */
 	template<typename T = unsigned char, typename ContainerT = std::vector<T>, typename CharT>
 	inline ContainerT from_hex(const CharT *str)
 	{
@@ -230,6 +243,38 @@ namespace libdane
 	}
 	
 	/**
+	 * Calculates a hash of the given data.
+	 * 
+	 * This is a convenience overload for one-line hash calculations.
+	 * 
+	 * @tparam T Value type for the container
+	 * @tparam CharT Underlying character type
+	 * @param type Type of hash to calculate
+	 * @param str String to hash
+	 */
+	template<typename T = unsigned char, typename CharT>
+	inline std::vector<T> hash(const EVP_MD *type, const std::basic_string<CharT> &str)
+	{
+		return hash<T>(type, str.begin(), str.end());
+	}
+	
+	/**
+	 * Calculates a hash of the given data.
+	 * 
+	 * This is a convenience overload for one-line hash calculations.
+	 * 
+	 * @tparam T Value type for the container
+	 * @tparam CharT Underlying character type
+	 * @param type Type of hash to calculate
+	 * @param str String to hash
+	 */
+	template<typename T = unsigned char, typename CharT>
+	inline std::vector<T> hash(const EVP_MD *type, const CharT *str)
+	{
+		return hash<T, CharT>(type, std::basic_string<CharT>(str));
+	}
+	
+	/**
 	 * Returns an EVP_MD from the given matching type.
 	 * 
 	 * @param  type Matching type
@@ -283,6 +328,40 @@ namespace libdane
 		std::vector<T> vec;
 		match(type, std::back_inserter(vec), begin, end);
 		return vec;
+	}
+	
+	/**
+	 * Decodes a hexadecimal string.
+	 * 
+	 * This is a convenience function for decoding a string straight into a
+	 * newly constructed container.
+	 * 
+	 * @tparam T Type to cast values through
+	 * @tparam CharT Underlying character type
+	 * @param str String to decode
+	 * @return A new vector with the decoded data
+	 */
+	template<typename T = unsigned char, typename CharT>
+	inline std::vector<T> match(MatchingType type, const std::basic_string<CharT> &str)
+	{
+		return match<T>(type, str.begin(), str.end());
+	}
+	
+	/**
+	 * Decodes a hexadecimal string.
+	 * 
+	 * This is a convenience function for decoding a string straight into a
+	 * newly constructed container.
+	 * 
+	 * @tparam T Type to cast values through
+	 * @tparam CharT Underlying character type
+	 * @param str String to decode
+	 * @return A new ContainerT with the decoded data
+	 */
+	template<typename T = unsigned char, typename CharT>
+	inline std::vector<T> match(MatchingType type, const CharT *str)
+	{
+		return match<T, CharT>(type, std::basic_string<CharT>(str));
 	}
 }
 
