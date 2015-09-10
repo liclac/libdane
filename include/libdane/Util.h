@@ -207,6 +207,7 @@ namespace libdane
 	 * @param first An insert iterator into a container
 	 * @param begin Iterator to the start of the data
 	 * @param end Iterator to the end of the data
+	 * @throws std::runtime_error for an invalid type
 	 */
 	template<typename IterT, typename OutputIt>
 	inline OutputIt match(MatchingType type, OutputIt first, IterT begin, IterT end)
@@ -224,6 +225,7 @@ namespace libdane
 	 * @param type Matching type
 	 * @param begin Iterator to the start of the data
 	 * @param end Iterator to the end of the data
+	 * @throws std::runtime_error for an invalid type
 	 */
 	template<typename T = unsigned char, typename IterT>
 	inline std::vector<T> match(MatchingType type, IterT begin, IterT end)
