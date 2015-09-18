@@ -99,3 +99,31 @@ SCENARIO("Wire encoding works")
 		}
 	}
 }
+
+SCENARIO("DNSSEC verification works")
+{
+	asio::io_service service;
+	Resolver res(service);
+	
+	GIVEN("A DNSSEC-authenticated response")
+	{
+		std::shared_ptr<ldns_pkt> pkt(ldns_pkt_new(), ldns_pkt_free);
+		ldns_pkt_set_flags(&*pkt, LDNS_QR|LDNS_RD|LDNS_RA|LDNS_AA);
+		
+		THEN("Verification should pass")
+		{
+			REQUIRE(res.verifyDNSSEC(pkt));
+		}
+	}
+	
+	GIVEN("An unauthenticated response")
+	{
+		std::shared_ptr<ldns_pkt> pkt(ldns_pkt_new(), ldns_pkt_free);
+		ldns_pkt_set_flags(&*pkt, LDNS_QR|LDNS_RD|LDNS_RA);
+		
+		THEN("Verification should fail")
+		{
+			REQUIRE_FALSE(res.verifyDNSSEC(pkt));
+		}
+	}
+}
