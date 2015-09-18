@@ -96,7 +96,7 @@ std::shared_ptr<ldns_pkt> Resolver::unwire(const std::vector<unsigned char> &wir
 
 bool Resolver::verifyDNSSEC(std::shared_ptr<ldns_pkt> pkt)
 {
-	return ldns_pkt_ad(&*pkt);
+	return ldns_pkt_aa(&*pkt);
 }
 
 
