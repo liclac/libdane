@@ -57,14 +57,19 @@ namespace libdane
 			
 			
 			/**
-			 * Returns a reference to the list of nameserver endpoints.
+			 * Returns a reference to the list of nameserver addresses.
 			 */
-			const std::vector<asio::ip::tcp::endpoint>& endpoints() const;
+			const std::vector<asio::ip::address>& nameServers() const;
 			
 			/**
 			 * Replaces the current config.
 			 */
-			 void setEndpoints(const std::vector<asio::ip::tcp::endpoint>& v);
+			 void setNameServers(const std::vector<asio::ip::address>& v);
+			 
+			 /**
+			  * Returns a list of TCP endpoints for the nameservers.
+			  */
+			 std::vector<asio::ip::tcp::endpoint> tcpEndpoints() const;
 			
 			
 			
@@ -96,9 +101,9 @@ namespace libdane
 			
 		protected:
 			/**
-			 * A list of possible endpoints to connect to.
+			 * A list of possible addresses to connect to.
 			 */
-			std::vector<asio::ip::tcp::endpoint> m_endpoints;
+			std::vector<asio::ip::address> m_nameServers;
 		};
 	}
 }
