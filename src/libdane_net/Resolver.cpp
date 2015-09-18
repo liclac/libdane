@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 #include <stdexcept>
+#include <iostream>
 
 using namespace libdane;
 using namespace libdane::net;
@@ -56,6 +57,7 @@ std::shared_ptr<ldns_pkt> Resolver::makeQuery(const std::string &domain, ldns_rr
 {
 	ldns_rdf *dname = ldns_dname_new_frm_str(domain.c_str());
 	std::shared_ptr<ldns_pkt> pkt(ldns_pkt_query_new(dname, rr_type, rr_class, flags), ldns_pkt_free);
+	ldns_pkt_set_edns_do(&*pkt, 1);
 	if (!pkt) {
 		throw std::runtime_error("Couldn't create a query packet");
 	}
@@ -92,12 +94,35 @@ std::shared_ptr<ldns_pkt> Resolver::unwire(const std::vector<unsigned char> &wir
 	return std::shared_ptr<ldns_pkt>(packet_ptr, ldns_pkt_free);
 }
 
+bool Resolver::verifyDNSSEC(std::shared_ptr<ldns_pkt> pkt)
+{
+	ldns_rr_list *qs = ldns_pkt_answer(&*pkt);
+	for (size_t i = 0; i < ldns_rr_list_rr_count(qs); i++) {
+		ldns_rr *rr = ldns_rr_list_rr(qs, i);
+		ldns_rr_type type = ldns_rr_get_type(rr);
+		ldns_rdf *name = ldns_rr_owner(rr);
+		if (!this->verifyDNSSEC(pkt, name, type)) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+bool Resolver::verifyDNSSEC(std::shared_ptr<ldns_pkt> pkt, ldns_rdf *name, ldns_rr_type type)
+{
+	ldns_rr_list *keys = ldns_rr_list_new();
+	ldns_rr_list *good_keys = ldns_rr_list_new();
+	ldns_status status = ldns_pkt_verify(&*pkt, type, name, keys, nullptr, good_keys);
+	return status == LDNS_STATUS_OK;
+}
+
 
 
 void Resolver::query(std::vector<std::shared_ptr<ldns_pkt>> pkts, MultiQueryCallback cb)
 {
 	if (!pkts.size()) {
-		cb({}, {});
+		cb({}, {}, {});
 	}
 	
 	auto ctx = std::make_shared<ConnectionContext>();
@@ -108,7 +133,7 @@ void Resolver::query(std::vector<std::shared_ptr<ldns_pkt>> pkts, MultiQueryCall
 	auto endpoints = m_config.endpoints();
 	async_connect(*sock, endpoints.begin(), endpoints.end(), [=](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::const_iterator it) {
 		if (err) {
-			cb(err, {});
+			cb(err, {}, {});
 			return;
 		}
 		
@@ -118,8 +143,12 @@ void Resolver::query(std::vector<std::shared_ptr<ldns_pkt>> pkts, MultiQueryCall
 
 void Resolver::query(std::shared_ptr<ldns_pkt> pkt, QueryCallback cb)
 {
-	this->query({pkt}, [=](const asio::error_code &err, std::vector<std::shared_ptr<ldns_pkt>> pkts) {
-		cb(err, pkts.size() > 0 ? pkts[0] : nullptr);
+	this->query({pkt}, [=](const asio::error_code &err, std::vector<std::shared_ptr<ldns_pkt>> pkts, const std::vector<bool> dnssec) {
+		if (pkts.size() > 0) {
+			cb(err, pkts[0], dnssec[0]);
+		} else {
+			cb(err, nullptr, true);
+		}
 	});
 }
 
@@ -142,13 +171,13 @@ void Resolver::lookupDANE(const std::string &domain, unsigned short port, libdan
 
 void Resolver::lookupDANE(const std::string &record_name, DANECallback cb)
 {
-	this->query(record_name, LDNS_RR_TYPE_TLSA, [=](const asio::error_code &err, std::shared_ptr<ldns_pkt> pkt) {
+	this->query(record_name, LDNS_RR_TYPE_TLSA, [=](const asio::error_code &err, std::shared_ptr<ldns_pkt> pkt, bool dnssec) {
 		if (err) {
-			cb(err, {}, false);
+			cb(err, {}, dnssec);
 			return;
 		}
 		
-		cb({}, this->decodeTLSA(pkt), false);
+		cb({}, this->decodeTLSA(pkt), dnssec);
 	});
 }
 
@@ -157,14 +186,19 @@ void Resolver::sendQueryChain(std::shared_ptr<asio::ip::tcp::socket> sock, std::
 	ctx->buffer = this->wire(*ctx->it, true);
 	this->sendQuery(sock, ctx->buffer, [=](const asio::error_code &err) mutable {
 		if (err) {
-			cb(err, {});
+			cb(err, {}, {});
 			return;
 		}
 		
 		*(ctx->it) = this->unwire(ctx->buffer);
 		++(ctx->it);
 		if (ctx->it == ctx->pkts.end()) {
-			cb({}, ctx->pkts);
+			std::vector<bool> dnssec;
+			dnssec.reserve(ctx->pkts.size());
+			for (auto pkt : ctx->pkts) {
+				dnssec.push_back(this->verifyDNSSEC(pkt));
+			}
+			cb({}, ctx->pkts, dnssec);
 			return;
 		}
 		

@@ -37,12 +37,12 @@ namespace libdane
 			/**
 			 * Callback type for multi-query functions.
 			 */
-			typedef std::function<void(const asio::error_code &err, std::vector<std::shared_ptr<ldns_pkt>> pkts)> MultiQueryCallback;
+			typedef std::function<void(const asio::error_code &err, std::vector<std::shared_ptr<ldns_pkt>> pkts, const std::vector<bool> dnssec)> MultiQueryCallback;
 			
 			/**
 			 * Callback type for query functions.
 			 */
-			typedef std::function<void(const asio::error_code &err, std::shared_ptr<ldns_pkt> pkt)> QueryCallback;
+			typedef std::function<void(const asio::error_code &err, std::shared_ptr<ldns_pkt> pkt, bool dnssec)> QueryCallback;
 			
 			/**
 			 * Callback type for DANE lookup functions.
@@ -117,6 +117,26 @@ namespace libdane
 			 * @return A decoded packet
 			 */
 			std::shared_ptr<ldns_pkt> unwire(const std::vector<unsigned char> &wire);
+			
+			/**
+			 * Locally verifies the packet's DNSSEC signature.
+			 * 
+			 * This will 
+			 * 
+			 * @param  pkt Packet to verify
+			 * @return     DNSSEC status
+			 */
+			bool verifyDNSSEC(std::shared_ptr<ldns_pkt> pkt);
+			
+			/**
+			 * Locally verifies a record's DNSSEC signature.
+			 * 
+			 * @param  pkt  Packet to verify
+			 * @param  name Owner name for the verified record
+			 * @param  type Type of the verified record
+			 * @return      DNSSEC status
+			 */
+			bool verifyDNSSEC(std::shared_ptr<ldns_pkt> pkt, ldns_rdf *name, ldns_rr_type type);
 			
 			
 			
