@@ -68,7 +68,7 @@ SCENARIO("Wire encoding works")
 			
 			THEN("The checksum should be correct")
 			{
-				REQUIRE(to_hex(hash(EVP_sha256(), udp)) == "cc43d1338bffcc384219754b99618efa4cec609b32776d6d0b8c9fdf9aa69001");
+				REQUIRE(to_hex(hash(EVP_sha256(), udp)) == "8d5c5dac2d1245c7f6eb23e1ea7e148664d49bc280481128e6f3693b26dd97de");
 			}
 			
 			THEN("Encoded for TCP")
