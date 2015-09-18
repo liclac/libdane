@@ -50,6 +50,12 @@ SCENARIO("Query construction works")
 			CHECK(ldns_rr_get_type(rr) == LDNS_RR_TYPE_A);
 			CHECK(ldns_rr_get_class(rr) == LDNS_RR_CLASS_IN);	// This is a default
 		}
+		
+		THEN("It should have ENDS data for DNSSEC")
+		{
+			CHECK(ldns_pkt_edns(&*pkt));
+			CHECK(ldns_pkt_edns_do(&*pkt));
+		}
 	}
 }
 
