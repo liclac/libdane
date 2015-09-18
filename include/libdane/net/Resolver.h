@@ -119,24 +119,16 @@ namespace libdane
 			std::shared_ptr<ldns_pkt> unwire(const std::vector<unsigned char> &wire);
 			
 			/**
-			 * Locally verifies the packet's DNSSEC signature.
+			 * Checks the packet's DNSSEC authorization status.
 			 * 
-			 * This will 
+			 * This will assume that the AD flag on the returned packet is
+			 * trustworthy, and by extension, that the DNS server you're
+			 * querying can be trusted. Choose your server wisely.
 			 * 
 			 * @param  pkt Packet to verify
 			 * @return     DNSSEC status
 			 */
 			bool verifyDNSSEC(std::shared_ptr<ldns_pkt> pkt);
-			
-			/**
-			 * Locally verifies a record's DNSSEC signature.
-			 * 
-			 * @param  pkt  Packet to verify
-			 * @param  name Owner name for the verified record
-			 * @param  type Type of the verified record
-			 * @return      DNSSEC status
-			 */
-			bool verifyDNSSEC(std::shared_ptr<ldns_pkt> pkt, ldns_rdf *name, ldns_rr_type type);
 			
 			
 			

@@ -96,25 +96,7 @@ std::shared_ptr<ldns_pkt> Resolver::unwire(const std::vector<unsigned char> &wir
 
 bool Resolver::verifyDNSSEC(std::shared_ptr<ldns_pkt> pkt)
 {
-	ldns_rr_list *qs = ldns_pkt_answer(&*pkt);
-	for (size_t i = 0; i < ldns_rr_list_rr_count(qs); i++) {
-		ldns_rr *rr = ldns_rr_list_rr(qs, i);
-		ldns_rr_type type = ldns_rr_get_type(rr);
-		ldns_rdf *name = ldns_rr_owner(rr);
-		if (!this->verifyDNSSEC(pkt, name, type)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-bool Resolver::verifyDNSSEC(std::shared_ptr<ldns_pkt> pkt, ldns_rdf *name, ldns_rr_type type)
-{
-	ldns_rr_list *keys = ldns_rr_list_new();
-	ldns_rr_list *good_keys = ldns_rr_list_new();
-	ldns_status status = ldns_pkt_verify(&*pkt, type, name, keys, nullptr, good_keys);
-	return status == LDNS_STATUS_OK;
+	return ldns_pkt_ad(&*pkt);
 }
 
 
