@@ -129,3 +129,9 @@ SCENARIO("Records can be parsed from TLSA RRs")
 		REQUIRE(to_hex(rec.data()) == "fe");
 	}
 }
+
+SCENARIO("Resource record names can be generated")
+{
+	REQUIRE(resource_record_name("example.com", 25, TCP) == "_25._tcp.example.com");
+	REQUIRE(resource_record_name("example.com", 99, UDP) == "_99._udp.example.com");
+}
