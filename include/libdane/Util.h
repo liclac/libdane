@@ -112,7 +112,6 @@ namespace libdane
 	inline ContainerT from_hex(StringIt begin, StringIt end)
 	{
 		ContainerT container;
-		container.reserve(std::distance(begin, end) / 2);
 		from_hex<T>(std::back_inserter(container), begin, end);
 		return container;
 	}
@@ -150,6 +149,10 @@ namespace libdane
 	template<typename T = unsigned char, typename ContainerT = std::vector<T>, typename CharT>
 	inline ContainerT from_hex(const CharT *str)
 	{
+		if (str == nullptr) {
+			return ContainerT();
+		}
+		
 		return from_hex<T, ContainerT, CharT>(std::basic_string<CharT>(str));
 	}
 	
@@ -271,6 +274,10 @@ namespace libdane
 	template<typename T = unsigned char, typename CharT>
 	inline std::vector<T> hash(const EVP_MD *type, const CharT *str)
 	{
+		if (str == nullptr) {
+			str = "";
+		}
+		
 		return hash<T, CharT>(type, std::basic_string<CharT>(str));
 	}
 	
