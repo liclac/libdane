@@ -430,3 +430,127 @@ SCENARIO("All hash() overloads work")
 		}
 	}
 }
+
+SCENARIO("md_from_matching_type() works")
+{
+	GIVEN("Hash types")
+	{
+		THEN("It should return the correct function")
+		{
+			CHECK(md_from_matching_type(SHA256Hash) == EVP_sha256());
+			CHECK(md_from_matching_type(SHA512Hash) == EVP_sha512());
+		}
+	}
+	
+	GIVEN("ExactMatch")
+	{
+		THEN("It should return null")
+		{
+			CHECK(md_from_matching_type(ExactMatch) == nullptr);
+		}
+	}
+	
+	GIVEN("An invalid type")
+	{
+		THEN("It should throw an exception")
+		{
+			CHECK_THROWS_AS(md_from_matching_type(static_cast<MatchingType>(255)), std::runtime_error);
+		}
+	}
+}
+
+SCENARIO("match() works")
+{
+	GIVEN("A string")
+	{
+		std::string str("lorem ipsum dolor sit amet");
+		std::vector<unsigned char> vec(str.begin(), str.end());
+		
+		WHEN("Using ExactMatch")
+		{
+			auto data = match(ExactMatch, vec.begin(), vec.end());
+			
+			THEN("It should return the original data")
+			{
+				REQUIRE(data == vec);
+			}
+		}
+		
+		WHEN("Using hashes")
+		{
+			auto data256 = match(SHA256Hash, vec.begin(), vec.end());
+			auto data512 = match(SHA512Hash, vec.begin(), vec.end());
+			
+			THEN("It should return the hashed data")
+			{
+				CHECK(data256 == hash(EVP_sha256(), vec.begin(), vec.end()));
+				CHECK(data512 == hash(EVP_sha512(), vec.begin(), vec.end()));
+			}
+		}
+		
+		WHEN("Using an invalid type")
+		{
+			MatchingType type = static_cast<MatchingType>(255);
+			
+			THEN("It should throw a std::runtime_error")
+			{
+				CHECK_THROWS_AS(match(type, vec.begin(), vec.end()), std::runtime_error);
+			}
+		}
+	}
+	
+	GIVEN("No data")
+	{
+		std::vector<char> vec;
+		
+		WHEN("Using ExactMatch")
+		{
+			auto data = match(ExactMatch, vec.begin(), vec.end());
+			
+			THEN("It should return nothing")
+			{
+				REQUIRE(data.size() == 0);
+			}
+		}
+	}
+}
+
+SCENARIO("All match() overloads work")
+{
+	std::string str("lorem ipsum dolor sit amet");
+	std::vector<unsigned char> data(str.begin(), str.end());
+	
+	WHEN("Using match(MatchingType, OutputIt, IterT, IterT)")
+	{
+		std::vector<unsigned char> res;
+		auto it = match(ExactMatch, back_inserter(res), data.begin(), data.end());
+		
+		THEN("The data should be correct")
+		{
+			REQUIRE(res == data);
+		}
+		
+		THEN("It should return a back inserter")
+		{
+			REQUIRE(res.size() == 26);
+			*it++ = 0x01;
+			REQUIRE(res.size() == 27);
+			REQUIRE(res[26] == 0x01);
+		}
+	}
+	
+	WHEN("Using match(MatchingType type, IterT begin, IterT end)")
+	{
+		REQUIRE(match(ExactMatch, data.begin(), data.end()) == data);
+	}
+	
+	WHEN("Using match(MatchingType, const std::basic_string<CharT>&)")
+	{
+		REQUIRE(match(ExactMatch, str.begin(), str.end()) == data);
+	}
+	
+	WHEN("Using match(MatchingType, const CharT*)")
+	{
+		REQUIRE(match(ExactMatch, str.c_str()) == data);
+	}
+}
