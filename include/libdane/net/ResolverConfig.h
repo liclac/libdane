@@ -69,7 +69,7 @@ namespace libdane
 			 /**
 			  * Returns a list of TCP endpoints for the nameservers.
 			  */
-			 std::vector<asio::ip::tcp::endpoint> tcpEndpoints() const;
+			 std::vector<asio::ip::tcp::endpoint> endpoints() const;
 			
 			
 			

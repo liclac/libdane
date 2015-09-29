@@ -112,7 +112,7 @@ void Resolver::query(std::vector<std::shared_ptr<ldns_pkt>> pkts, MultiQueryCall
 	ctx->it = ctx->pkts.begin();
 	
 	auto sock = std::make_shared<asio::ip::tcp::socket>(m_service);
-	auto endpoints = m_config.tcpEndpoints();
+	auto endpoints = m_config.endpoints();
 	async_connect(*sock, endpoints.begin(), endpoints.end(), [=](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::const_iterator it) {
 		if (err) {
 			cb(err, {}, {});

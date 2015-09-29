@@ -28,7 +28,7 @@ ResolverConfig::~ResolverConfig()
 const std::vector<asio::ip::address>& ResolverConfig::nameServers() const { return m_nameServers; }
 void ResolverConfig::setNameServers(const std::vector<asio::ip::address>& v) { m_nameServers = v; }
 
-std::vector<asio::ip::tcp::endpoint> ResolverConfig::tcpEndpoints() const
+std::vector<asio::ip::tcp::endpoint> ResolverConfig::endpoints() const
 {
 	std::vector<asio::ip::tcp::endpoint> endpoints;
 	for (auto addr : m_nameServers) {
