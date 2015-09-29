@@ -110,15 +110,7 @@ void Resolver::query(std::vector<std::shared_ptr<ldns_pkt>> pkts, MultiQueryCall
 	auto ctx = std::make_shared<ConnectionContext>();
 	ctx->pkts = pkts;
 	ctx->it = ctx->pkts.begin();
-	
-	auto sock = std::make_shared<asio::ip::tcp::socket>(m_service);
-	auto endpoints = m_config.endpoints();
-	async_connect(*sock, endpoints.begin(), endpoints.end(), [=](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::const_iterator it) {
-		if (err) {
-			cb(err, {}, {});
-			return;
-		}
-		
+	this->connect(m_config, [=](const asio::error_code &err, std::shared_ptr<asio::ip::tcp::socket> sock) {
 		this->sendQueryChain(sock, ctx, cb);
 	});
 }
@@ -160,6 +152,20 @@ void Resolver::lookupDANE(const std::string &record_name, DANECallback cb)
 		}
 		
 		cb({}, this->decodeTLSA(pkt), dnssec);
+	});
+}
+
+void Resolver::connect(const ResolverConfig &conf, std::function<void(const asio::error_code &err, std::shared_ptr<asio::ip::tcp::socket>)> cb) const
+{
+	auto sock = std::make_shared<asio::ip::tcp::socket>(m_service);
+	auto endpoints = conf.endpoints();
+	async_connect(*sock, endpoints.begin(), endpoints.end(), [=](const asio::error_code &err, std::vector<asio::ip::tcp::endpoint>::const_iterator it) {
+		if (err) {
+			cb(err, nullptr);
+			return;
+		}
+		
+		cb(err, sock);
 	});
 }
 

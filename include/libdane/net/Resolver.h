@@ -211,6 +211,14 @@ namespace libdane
 			};
 			
 			/**
+			 * Creates a connection to a configured DNS server.
+			 * 
+			 * @param conf Resolver configuration to use
+			 * @param cb   Callback that receives a socket
+			 */
+			void connect(const ResolverConfig &conf, std::function<void(const asio::error_code &err, std::shared_ptr<asio::ip::tcp::socket>)> cb) const;
+			
+			/**
 			 * Recursively sends the queries described by a context.
 			 * 
 			 * This will wire-encode the packet described by ctx->it, replace
