@@ -6,7 +6,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test)
 # All files called test_*.cpp should be turned into test targets
 # Target names are based on the files' relative paths from this directory,
 # with any slashes replaced with underscores
-file(GLOB TEST_SOURCES */test_*.cpp)
+file(GLOB_RECURSE TEST_SOURCES test_*.cpp)
 foreach (path ${TEST_SOURCES})
 	string(REGEX REPLACE "^${CMAKE_CURRENT_LIST_DIR}/" "" relpath ${path})
 	string(REGEX REPLACE "/+" "_" target ${relpath})

@@ -9,6 +9,7 @@
 #include <libdane/DANERecord.h>
 #include <libdane/Util.h>
 #include <libdane/net/Util.h>
+#include <algorithm>
 #include <memory>
 #include <vector>
 #include <stdexcept>
@@ -85,10 +86,10 @@ std::vector<unsigned char> Resolver::wire(std::shared_ptr<ldns_pkt> pkt, bool tc
 	return wire;
 }
 
-std::shared_ptr<ldns_pkt> Resolver::unwire(const std::vector<unsigned char> &wire)
+std::shared_ptr<ldns_pkt> Resolver::unwire(const std::vector<unsigned char>::iterator &begin, const std::vector<unsigned char>::iterator &end)
 {
 	ldns_pkt *packet_ptr;
-	if (ldns_wire2pkt(&packet_ptr, wire.data(), wire.size()) != LDNS_STATUS_OK) {
+	if (ldns_wire2pkt(&packet_ptr, &*begin, std::distance(begin, end)) != LDNS_STATUS_OK) {
 		throw std::runtime_error("Failed to decode response");
 	}
 	return std::shared_ptr<ldns_pkt>(packet_ptr, ldns_pkt_free);
@@ -178,7 +179,7 @@ void Resolver::sendQueryChain(std::shared_ptr<asio::ip::tcp::socket> sock, std::
 			return;
 		}
 		
-		*(ctx->it) = this->unwire(ctx->buffer);
+		*(ctx->it) = this->unwire(ctx->buffer.begin(), ctx->buffer.end());
 		++(ctx->it);
 		if (ctx->it == ctx->pkts.end()) {
 			std::vector<bool> dnssec;

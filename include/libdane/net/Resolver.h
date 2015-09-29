@@ -116,7 +116,7 @@ namespace libdane
 			 * @param  wire Wire representation of the packet
 			 * @return A decoded packet
 			 */
-			std::shared_ptr<ldns_pkt> unwire(const std::vector<unsigned char> &wire);
+			std::shared_ptr<ldns_pkt> unwire(const std::vector<unsigned char>::iterator &begin, const std::vector<unsigned char>::iterator &end);
 			
 			/**
 			 * Checks the packet's DNSSEC authorization status.
@@ -216,7 +216,7 @@ namespace libdane
 			 * @param conf Resolver configuration to use
 			 * @param cb   Callback that receives a socket
 			 */
-			void connect(const ResolverConfig &conf, std::function<void(const asio::error_code &err, std::shared_ptr<asio::ip::tcp::socket>)> cb) const;
+			virtual void connect(const ResolverConfig &conf, std::function<void(const asio::error_code &err, std::shared_ptr<asio::ip::tcp::socket>)> cb) const;
 			
 			/**
 			 * Recursively sends the queries described by a context.
@@ -229,12 +229,12 @@ namespace libdane
 			 * @param ctx  Context descriptor
 			 * @param cb   Callback when finished
 			 */
-			void sendQueryChain(std::shared_ptr<asio::ip::tcp::socket> sock, std::shared_ptr<ConnectionContext> ctx, MultiQueryCallback cb);
+			virtual void sendQueryChain(std::shared_ptr<asio::ip::tcp::socket> sock, std::shared_ptr<ConnectionContext> ctx, MultiQueryCallback cb);
 			
 			/**
 			 * Sends a query buffer through an open socket.
 			 */
-			void sendQuery(std::shared_ptr<asio::ip::tcp::socket> sock, std::vector<unsigned char> &buffer, std::function<void(const asio::error_code &err)>);
+			virtual void sendQuery(std::shared_ptr<asio::ip::tcp::socket> sock, std::vector<unsigned char> &buffer, std::function<void(const asio::error_code &err)> cb);
 			
 		protected:
 			/**
